@@ -1,0 +1,8 @@
+{
+  "name": "crocodile2u/validity",
+  "autoload": {
+    "psr-0" : {
+      "validity" : "./src"
+    }
+  }
+}
