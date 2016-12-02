@@ -106,7 +106,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     public function testAssocValidation()
     {
         $NestedField = Field::any('nested_key');
-        $Validator = (new FieldSet())->addField(
+        $Validator = (new FieldSet())->add(
             $NestedField
         );
         $F = Field::assoc('key', $Validator);
@@ -127,7 +127,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     public function testAssocValidationWithCallback()
     {
         $NestedField = Field::any('nested_key');
-        $Validator = (new FieldSet())->addField(
+        $Validator = (new FieldSet())->add(
             $NestedField
         );
 

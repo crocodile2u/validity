@@ -537,7 +537,7 @@ class Field
         } elseif (!$this->checkRequiredCondition()) {
             return true;
         } else {
-            return $this->addError(sprintf($this->requiredMessage, $this->name));
+            return $this->addError($this->smartMessage($this->requiredMessage, Language::REQUIRED));
         }
     }
 
@@ -745,8 +745,9 @@ class Field
 
     private function checkCallback($value, $message, $args, $key)
     {
-        $callback = reset($args);
-        $message = $this->smartMessage($message, Language::FIELD_FAILED_VALIDATION);
+        $callback = array_shift($args);
+        $messageKey = array_shift($args) ?: Language::FIELD_FAILED_VALIDATION;
+        $message = $this->smartMessage($message, $messageKey);
         return call_user_func_array($callback, [$this->name, $value, $message, $this->Result, $key]);
     }
 

@@ -13,7 +13,7 @@ class FieldSet
      * @param Field $Field
      * @return FieldSet
      */
-    public function addField(Field $Field)
+    public function add(Field $Field)
     {
         $this->Fields[] = $Field;
         return $this;

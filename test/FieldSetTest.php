@@ -11,8 +11,8 @@ class FieldSetTest extends \PHPUnit_Framework_TestCase
     public function testCheck()
     {
         $V = new FieldSet();
-        $V->addField(new StubFieldPass())
-            ->addField(new StubFieldFail());
+        $V->add(new StubFieldPass())
+            ->add(new StubFieldFail());
 
         $data = array(
             StubFieldPass::NAME => StubFieldPass::NAME . ' data',
@@ -30,7 +30,7 @@ class FieldSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(StubFieldFail::ERROR_MESSAGE, $errors[StubFieldFail::NAME]);
 
         $V = new FieldSet();
-        $V->addField(
+        $V->add(
             Field::enum('type', array('value 1', 'value 2'))->setDefault('default', true, true)
         );
         $input = array('type' => false);

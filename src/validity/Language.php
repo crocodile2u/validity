@@ -76,10 +76,15 @@ abstract class Language
         }
     }
 
+    /**
+     * @param $template
+     * @param array $data
+     * @return mixed
+     */
     public function message($template, array $data = [])
     {
-        return preg_replace_callback(
-            "/\{([a-z+])\}/",
+        $message = preg_replace_callback(
+            "/\{([a-z]+)\}/",
             function($m) use ($data) {
                 $dataKey = $m[1];
                 if (array_key_exists($dataKey, $data)) {
@@ -90,5 +95,6 @@ abstract class Language
             },
             $template
         );
+        return mb_strtoupper(mb_substr($message, 0, 1)) . mb_substr($message, 1);
     }
 }
