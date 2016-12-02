@@ -78,7 +78,7 @@ class Field
     );
 
     /** @var Report */
-    private $Result;
+    private $Report;
     private $currentValue;
     private $valueExists = false;
     private $valueEmpty = true;
@@ -213,22 +213,19 @@ class Field
         return (new self($name, self::STRING, null))->addRegexpRule($pattern, $message);
     }
 
-    public static function assoc($name, FieldSet $innerFieldSet, $message = null, $mergeErrors = true, $mergeSeparator = "; ")
+    public static function assoc($name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ")
     {
         return (new self($name, self::ANY, null))->addCallbackRule(
-            function($name, $value, $message, Report $Result) use ($innerFieldSet, $mergeErrors, $mergeSeparator) {
+            function($name, $value, $message, Report $Report) use ($innerFieldSet, $errorSeparator) {
                 if (!is_array($value)) {
-                    return $Result->addError($name, $message);
+                    return $Report->addError($name, $message);
                 }
 
                 if ($innerFieldSet->isValid($value)) {
                     return $innerFieldSet->getFiltered();
                 } else {
-                    $errors = $innerFieldSet->getErrors();
-                    if ($mergeErrors) {
-                        $errors = join($mergeSeparator, $errors);
-                    }
-                    return $Result->addError($name, $errors);
+                    $errors = join($errorSeparator, $innerFieldSet->getErrors()->toPlainArray($errorSeparator));
+                    return $Report->addError($name, $errors);
                 }
             },
             $message
@@ -376,8 +373,8 @@ class Field
     {
         if (!is_callable($callback)) {
             throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
-            $callback = function($name, $value, $message, Report $Result) {
-                $Result->addError($name, $message);
+            $callback = function($name, $value, $message, Report $Report) {
+                $Report->addError($name, $message);
                 return null;
             };
         }
@@ -407,11 +404,11 @@ class Field
     public function addRegexpRule($regexp, $message = null, $messageKey = Language::REGEXP_VALIDATION_FAILED)
     {
         return $this->addCallbackRule(
-            function($name, $value, $message, Report $Result) use ($regexp) {
+            function($name, $value, $message, Report $Report) use ($regexp) {
                 if (preg_match($regexp, $value)) {
                     return $value;
                 } else {
-                    return $Result->addError($name, $message);
+                    return $Report->addError($name, $message);
                 }
             },
             $message,
@@ -420,12 +417,12 @@ class Field
     }
 
     /**
-     * @param Report $Result
+     * @param Report $Report
      * @return bool
      */
-    public function isValid(Report $Result)
+    public function isValid(Report $Report)
     {
-        $this->Result = $Result;
+        $this->Report = $Report;
         $this->currentValue = $this->extractValue();
         $check = $this->checkRequired();
         $check = ($check && $this->checkArray());
@@ -437,11 +434,11 @@ class Field
             return true;
         } elseif ($this->defaultReplaceIncorrect) {
             $this->currentValue = $this->default;
-            $this->Result->resetErrors($this->name);
+            $this->Report->resetErrors($this->name);
             $this->setFilteredValue();
             return true;
         } else {
-            $this->Result->setFiltered($this->name, null);
+            $this->Report->setFiltered($this->name, null);
             return false;
         }
     }
@@ -544,7 +541,7 @@ class Field
     private function checkRequiredCondition()
     {
         return $this->requiredCallback
-            ? call_user_func_array($this->requiredCallback, array($this->currentValue, $this->Result))
+            ? call_user_func_array($this->requiredCallback, array($this->currentValue, $this->Report))
             : true;
     }
 
@@ -634,9 +631,9 @@ class Field
     {
         $this->valueExists = false;
         $this->valueEmpty = true;
-        $data = $this->Result->getRaw();
+        $data = $this->Report->getRaw();
         if (!is_array($data)) {
-            $this->Result->addError($this->name, "Data is not an array");
+            $this->Report->addError($this->name, "Data is not an array");
             return null;
         }
         if (array_key_exists($this->name, $data)) {
@@ -649,7 +646,7 @@ class Field
 
     private function addError($message)
     {
-        return $this->Result->addError($this->name, $message);
+        return $this->Report->addError($this->name, $message);
     }
 
     public function filterValue($value)
@@ -681,14 +678,14 @@ class Field
         if ($this->expectArray) {
             foreach ($this->currentValue as $key => &$value) {
                 $value = $this->$method($value, $message, $args, $key);
-                if (!$this->Result->isOk($this->name)) {
+                if (!$this->Report->isOk($this->name)) {
                     return false;
                 }
             }
         } else {
             $this->currentValue = $this->$method($this->currentValue, $message, $args, $this->name);
         }
-        return $this->Result->isOk($this->name);
+        return $this->Report->isOk($this->name);
     }
 
     private function checkInt($value, $message)
@@ -748,7 +745,7 @@ class Field
         $callback = array_shift($args);
         $messageKey = array_shift($args) ?: Language::FIELD_FAILED_VALIDATION;
         $message = $this->smartMessage($message, $messageKey);
-        return call_user_func_array($callback, [$this->name, $value, $message, $this->Result, $key]);
+        return call_user_func_array($callback, [$this->name, $value, $message, $this->Report, $key]);
     }
 
     private function checkString($value, $message, $args)
@@ -841,7 +838,7 @@ class Field
 
     private function setFilteredValue()
     {
-        $this->Result->setFiltered($this->name, $this->currentValue);
+        $this->Report->setFiltered($this->name, $this->currentValue);
         return true;
     }
 

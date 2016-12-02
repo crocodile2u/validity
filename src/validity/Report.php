@@ -6,25 +6,26 @@ class Report
 {
     private $raw = array();
     private $filtered = array();
-    private $errors = array();
+    private $errorSet;
 
     public function __construct($raw)
     {
         $this->raw = $raw;
+        $this->errorSet = new MessageSet();
     }
 
     public function resetErrors($field)
     {
-        unset($this->errors[$field]);
+        $this->errorSet->reset($field);
         return $this;
     }
 
     public function isOk($key = null)
     {
         if (null === $key) {
-            return 0 === count($this->errors);
+            return 0 === count($this->errorSet);
         } else {
-            return !array_key_exists($key, $this->errors);
+            return !$this->errorSet->offsetExists($key);
         }
     }
 
@@ -35,7 +36,7 @@ class Report
 
     public function addError($field, $message)
     {
-        $this->errors[$field] = $message;
+        $this->errorSet->add($field, $message);
         return null;
     }
 
@@ -58,7 +59,7 @@ class Report
 
     public function getErrors($key = null)
     {
-        return (null === $key) ? $this->errors : (isset($this->errors[$key]) ? $this->errors[$key] : null);
+        return (null === $key) ? $this->errorSet : (isset($this->errorSet[$key]) ? $this->errorSet[$key] : null);
     }
 
     public function getRaw($key = null)

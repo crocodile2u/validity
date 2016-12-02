@@ -27,7 +27,7 @@ class FieldSetTest extends \PHPUnit_Framework_TestCase
         $errors = $V->getErrors();
         $this->assertEquals(1, count($errors));
         $this->assertTrue(array_key_exists(StubFieldFail::NAME, $errors));
-        $this->assertEquals(StubFieldFail::ERROR_MESSAGE, $errors[StubFieldFail::NAME]);
+        $this->assertEquals(StubFieldFail::ERROR_MESSAGE, $errors->getAsString(StubFieldFail::NAME));
 
         $V = new FieldSet();
         $V->add(
@@ -45,9 +45,9 @@ class StubFieldPass extends Field
     {
         parent::__construct(self::NAME, self::STRING, null);
     }
-    public function isValid(Report $Result)
+    public function isValid(Report $Report)
     {
-        $Result->setFiltered(self::NAME, $Result->getRaw(self::NAME));
+        $Report->setFiltered(self::NAME, $Report->getRaw(self::NAME));
         return;
     }
 }
@@ -60,8 +60,8 @@ class StubFieldFail extends Field
     {
         parent::__construct(self::NAME, self::STRING, null);
     }
-    public function isValid(Report $Result)
+    public function isValid(Report $Report)
     {
-        $Result->addError($this->getName(), self::ERROR_MESSAGE);
+        $Report->addError($this->getName(), self::ERROR_MESSAGE);
     }
 }
