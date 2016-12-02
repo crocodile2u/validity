@@ -3,7 +3,7 @@
 namespace validity\test;
 
 use validity\FieldSet;
-use validity\Result;
+use validity\Report;
 use validity\Field;
 
 class FieldSetTest extends \PHPUnit_Framework_TestCase
@@ -45,7 +45,7 @@ class StubFieldPass extends Field
     {
         parent::__construct(self::NAME, self::STRING, null);
     }
-    public function isValid(Result $Result)
+    public function isValid(Report $Result)
     {
         $Result->setFiltered(self::NAME, $Result->getRaw(self::NAME));
         return;
@@ -60,7 +60,7 @@ class StubFieldFail extends Field
     {
         parent::__construct(self::NAME, self::STRING, null);
     }
-    public function isValid(Result $Result)
+    public function isValid(Report $Result)
     {
         $Result->addError($this->getName(), self::ERROR_MESSAGE);
     }

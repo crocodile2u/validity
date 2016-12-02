@@ -3,7 +3,7 @@
 namespace validity\test;
 
 use \validity\FieldSet;
-use \validity\Result;
+use \validity\Report;
 use \validity\Field;
 
 class FieldTest extends \PHPUnit_Framework_TestCase
@@ -132,7 +132,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         );
 
         $F = Field::assoc('key', $Validator)->addCallbackRule(
-            function($name, $value, $message, Result $Result) {
+            function($name, $value, $message, Report $Result) {
                 if ($value === ['nested_key' => 'valid']) {
                     return $value;
                 } else {
@@ -289,7 +289,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     {
         $F = Field::callback(
             'key',
-            function($name, $value, $message, Result $Result) {
+            function($name, $value, $message, Report $Result) {
                 if ($value === 'valid') {
                     return $value;
                 } else {
@@ -343,7 +343,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         // integer 15 - 20 is accepted
         $callback_threshold = 15;
         $F->addCallbackRule(
-            function($name, $value, $message, Result $Result) use ($callback_threshold) {
+            function($name, $value, $message, Report $Result) use ($callback_threshold) {
                 if ($value < $callback_threshold) {
                     $Result->addError($name, $message);
                     return null;
@@ -444,7 +444,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $data
-     * @return Result
+     * @return Report
      */
     private function result($data, $empty_if_null = true)
     {
@@ -453,6 +453,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         } else {
             $data = array('key' => $data);
         }
-        return new Result($data);
+        return new Report($data);
     }
 }

@@ -9,8 +9,9 @@ $sent = isset($_GET["sent"]);
 if ($sent) {
     $fieldSet = (new FieldSet())
         ->add(
-            Field::pattern("name", "/[A-Z][a-zA-Z\- ]+/", "Name should only contain latin letters and whitespaces, starting with a capital letter")
-                ->setRequired());
+            Field::pattern("name", "/[A-Z][a-zA-Z\- ]+/", "Name: only latin letters and spaces, starting with a capital letter")
+                ->setRequired()
+        );
 
     $valid = $fieldSet->isValid($_GET);
 }

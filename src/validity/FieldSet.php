@@ -5,39 +5,39 @@ namespace validity;
 class FieldSet
 {
     /** @var Field[] */
-    private $Fields = array();
-    /** @var Result */
-    private $LastResult;
+    private $fields = array();
+    /** @var Report */
+    private $lastReport;
 
     /**
      * @param Field $Field
      * @return FieldSet
      */
-    public function add(Field $Field)
+    public function add(Field $Field): FieldSet
     {
-        $this->Fields[] = $Field;
+        $this->fields[] = $Field;
         return $this;
     }
 
     /**
-     * @return Result
+     * @return Report
      */
-    public function lastResult()
+    public function lastReport(): Report
     {
-        return $this->LastResult;
+        return $this->lastReport;
     }
 
     /**
      * @param $data
-     * @return Result
+     * @return bool
      */
-    public function isValid($data)
+    public function isValid($data): bool
     {
-        $this->LastResult = new Result($data);
-        foreach ($this->Fields as $Field) {
-            $Field->isValid($this->LastResult);
+        $this->lastReport = new Report($data);
+        foreach ($this->fields as $Field) {
+            $Field->isValid($this->lastReport);
         }
-        return $this->LastResult->isOk();
+        return $this->lastReport->isOk();
     }
 
     /**
@@ -46,16 +46,16 @@ class FieldSet
      */
     public function getFiltered($key = null)
     {
-        return $this->lastResult()->getFiltered($key);
+        return $this->lastReport()->getFiltered($key);
     }
 
     public function getErrors($key = null)
     {
-        return $this->lastResult()->getErrors($key);
+        return $this->lastReport()->getErrors($key);
     }
 
     public function getRaw($key = null)
     {
-        return $this->lastResult()->getRaw($key);
+        return $this->lastReport()->getRaw($key);
     }
 }

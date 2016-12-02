@@ -2,7 +2,7 @@
 
 namespace validity;
 
-class Result
+class Report
 {
     private $raw = array();
     private $filtered = array();

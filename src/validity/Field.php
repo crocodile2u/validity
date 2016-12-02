@@ -77,7 +77,7 @@ class Field
         self::ANY,
     );
 
-    /** @var Result */
+    /** @var Report */
     private $Result;
     private $currentValue;
     private $valueExists = false;
@@ -160,7 +160,7 @@ class Field
     private static function createDateField($name, $type, $message, $formatProperty)
     {
         $field = new self($name, $type, $message);
-        $callback = (function($name, $value, $message, Result $Result) use ($field, $formatProperty) {
+        $callback = (function($name, $value, $message, Report $Result) use ($field, $formatProperty) {
             if (false === ($ts = strtotime($value))) {
                 return $Result->addError($name, $message);
             } else {
@@ -179,7 +179,7 @@ class Field
     public static function enum($name, $values, $message = null)
     {
         return (new self($name, self::ANY, null))->addCallbackRule(
-            function($name, $value, $message, Result $Result) use ($values) {
+            function($name, $value, $message, Report $Result) use ($values) {
                 if (in_array($value, $values)) {
                     return $value;
                 } else {
@@ -216,7 +216,7 @@ class Field
     public static function assoc($name, FieldSet $innerFieldSet, $message = null, $mergeErrors = true, $mergeSeparator = "; ")
     {
         return (new self($name, self::ANY, null))->addCallbackRule(
-            function($name, $value, $message, Result $Result) use ($innerFieldSet, $mergeErrors, $mergeSeparator) {
+            function($name, $value, $message, Report $Result) use ($innerFieldSet, $mergeErrors, $mergeSeparator) {
                 if (!is_array($value)) {
                     return $Result->addError($name, $message);
                 }
@@ -376,7 +376,7 @@ class Field
     {
         if (!is_callable($callback)) {
             throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
-            $callback = function($name, $value, $message, Result $Result) {
+            $callback = function($name, $value, $message, Report $Result) {
                 $Result->addError($name, $message);
                 return null;
             };
@@ -407,7 +407,7 @@ class Field
     public function addRegexpRule($regexp, $message = null, $messageKey = Language::REGEXP_VALIDATION_FAILED)
     {
         return $this->addCallbackRule(
-            function($name, $value, $message, Result $Result) use ($regexp) {
+            function($name, $value, $message, Report $Result) use ($regexp) {
                 if (preg_match($regexp, $value)) {
                     return $value;
                 } else {
@@ -420,10 +420,10 @@ class Field
     }
 
     /**
-     * @param Result $Result
+     * @param Report $Result
      * @return bool
      */
-    public function isValid(Result $Result)
+    public function isValid(Report $Result)
     {
         $this->Result = $Result;
         $this->currentValue = $this->extractValue();
