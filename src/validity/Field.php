@@ -317,11 +317,20 @@ class Field
     }
 
     /**
+     * @param Language $language
+     * @return Field
+     */
+    public function setLanguageIfNotYet(Language $language): Field
+    {
+        return $this->language ? $this : $this->setLanguage($language);
+    }
+
+    /**
      * @return Language
      */
     public function getLanguage(): Language
     {
-        return $this->language ?: Language::getInstance();
+        return $this->language ?: Language::createDefault();
     }
 
     /**

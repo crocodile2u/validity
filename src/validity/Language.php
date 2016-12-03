@@ -30,38 +30,15 @@ abstract class Language
         DATE_MAX = 22,
         ARRAY_MIN_LEN = 23,
         ARRAY_MAX_LEN = 24;
-    /**
-     * @var self
-     */
-    static private $instance;
 
     /**
      * @var string[]
      */
     protected $messages;
 
-    static function getDefault()
+    static function createDefault()
     {
         return new En;
-    }
-
-    /**
-     * @param Language $language
-     */
-    static function setInstance(self $language)
-    {
-        self::$instance = $language;
-    }
-
-    /**
-     * @return Language
-     */
-    static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::setInstance(self::getDefault());
-        }
-        return self::$instance;
     }
 
     /**

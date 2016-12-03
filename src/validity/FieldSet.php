@@ -8,6 +8,13 @@ class FieldSet
     private $fields = array();
     /** @var Report */
     private $lastReport;
+    /** @var Language */
+    private $language;
+
+    public function __construct(Language $language = null)
+    {
+        $this->language = $language ?: Language::createDefault();
+    }
 
     /**
      * @param Field $Field
@@ -15,7 +22,7 @@ class FieldSet
      */
     public function add(Field $Field): FieldSet
     {
-        $this->fields[] = $Field;
+        $this->fields[] = $Field->setLanguageIfNotYet($this->language);
         return $this;
     }
 
