@@ -45,7 +45,7 @@ $fieldSet = (new FieldSet())
             Field::int("subscriptions")->setMin(1)->expectArray()
         )->add(
             Field::email("email")->setRequiredIf(
-                function($value, \validity\Report $report) {
+                function(\validity\Report $report) {
                     return (bool) $report->getFiltered("subscriptions");
                 }
             )
@@ -100,7 +100,17 @@ Field can be marked as required:
 Field::string("username")->setRequired("Please enter username");
 ```
 
-Sometimes, a field is only required in case some other fields are filled (or any other conditions are met)
+Sometimes, a field is only required in case some other fields are filled (or any other conditions are met).
+
+```php
+Field::email("email")->setRequiredIf(
+    function(\validity\Report $report) {
+        return (bool) $report->getFiltered("subscriptions");
+    }
+);
+```
+
+_setRequiredIf()_ accepts either a boolean or a callback as argument. In first case, it simply marks the field as required or removes this mark. When a callable is used, it is evaluated in the process of validation, and the field is only considered as required if the callback returns TRUE. In the example above, the _email_ field is required in case the user has chosen to subscribe to some mailing list.
 
 ## Default values
 
