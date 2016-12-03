@@ -27,6 +27,7 @@ class Field
     private $expectArrayMessage;
     private $arrayMinLength = 0;
     private $arrayMaxLength = null;
+    private $arraySkipEmpty = true;
     /**
      * @var Language|null
      */
@@ -520,16 +521,31 @@ class Field
 
     /**
      * @param string|null $message
-     * @param int $minLength
-     * @param int|null $maxLength
      * @return Field
      */
-    public function expectArray($message = null, $minLength = 0, $maxLength = null): Field
+    public function expectArray($message = null): Field
     {
         $this->expectArray = true;
-        $this->arrayMinLength = $minLength;
-        $this->arrayMaxLength = $maxLength;
         $this->expectArrayMessage = $message;
+        return $this;
+    }
+
+    /**
+     * @param int $minLength
+     */
+    public function limitArrayLength(int $min, int $max = 0)
+    {
+        $this->arrayMinLength = $min;
+        $this->arrayMaxLength = $max;
+        return $this;
+    }
+
+    /**
+     * @param bool $flag
+     */
+    public function setArraySkipEmpty(bool $flag)
+    {
+        $this->arraySkipEmpty = $flag;
         return $this;
     }
     /**
@@ -603,7 +619,7 @@ class Field
      */
     private function checkArray(): bool
     {
-        if (null === $this->currentValue) {
+        if ($this->valueEmpty) {
             return true;
         }
 
@@ -611,6 +627,10 @@ class Field
             if (!is_array($this->currentValue)) {
                 $this->addError($this->getArrayMessage());
                 return false;
+            }
+
+            if ($this->arraySkipEmpty) {
+                $this->currentValue = array_filter($this->currentValue);
             }
 
             if ($this->arrayMinLength || $this->arrayMaxLength) {
@@ -697,6 +717,9 @@ class Field
      */
     private function checkType(): bool
     {
+        if ($this->valueEmpty) {
+            return true;
+        }
         return $this->checkSingleRule($this->type, $this->typeMessage, []);
     }
 

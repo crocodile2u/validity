@@ -22,6 +22,13 @@ if ($sent) {
             }, "Email is required in case you want to subscribe for news")
         )->add(
             Field::date("date_of_birth")->setMax("-18years")->setRequired()
+        )->add(
+            Field::string("education")
+                ->setMinLength(10)
+                ->setMaxLength(100)
+                ->expectArray()
+                ->limitArrayLength(0, 3)
+                ->setArraySkipEmpty(true)
         );
 
     $valid = $fieldSet->isValid($_GET);
@@ -95,6 +102,24 @@ if ($sent) {
                         <label class="control-label required">Date of birth (date, maximum 18 years ago)</label>
                         <div>
                             <input name="date_of_birth" class="form-control" value="<?=$data["date_of_birth"] ?? ""; ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label required">Education (array of string, 0 - 3 elements)</label>
+                        <div>
+                            <input name="education[]" class="form-control"
+                                   value="<?=$data["education"][0] ?? ""; ?>"
+                                   placeholder="School #1">
+                        </div>
+                        <div style="margin-top: .5em;">
+                            <input name="education[]" class="form-control"
+                                   value="<?=$data["education"][1] ?? ""; ?>"
+                                   placeholder="School #2">
+                        </div>
+                        <div style="margin-top: .5em;">
+                            <input name="education[]" class="form-control"
+                                   value="<?=$data["education"][2] ?? ""; ?>"
+                                   placeholder="School #3">
                         </div>
                     </div>
                     <div class="form-group">
