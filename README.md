@@ -13,7 +13,7 @@
 * Filtration with user-supplied callbacks.
 * Easy setting of limits (min/max) for numeric fields, date/datetime fields, setting min and max length for strings.
 * Marking a field as required. You can also specify a condition under which a certain field is required (i. e., when a user selects "University" as education level, University name field can be set as required).
-* Out-of-the-box English & Russian languages are at your disposal, containing default error messages for every case. You can easily create your own language class to use for default messages. At least for a boilerplate version of code those message should work fine, without any need to write them by hand.
+* Out-of-the-box English & Russian languages are at your disposal, containing default error messages for every case. You can easily create your own language class to use for default messages. At least for a boilerplate version of code those messages should work fine, without any need to write them by hand.
 * Easy to override error messages for each and every validation rule: if you don't specify an error message, then a default one is selected from the language class. If a message is provided for a rule, that message is used.
 * When dealing with strings, potentially malicious unicode characters are not allowed, for better security.
 
@@ -58,3 +58,4 @@ if ($fieldSet->isValid($_POST)) {
     echo $fieldSet->getErrors()->toString();
 }
 ```
+
