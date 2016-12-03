@@ -17,9 +17,12 @@ if ($sent) {
         )->add(
             Field::int("subscriptions", "Subscription ID is not an integer")->setMin(1)->expectArray()
         )->add(
-            Field::email("email")->setRequiredIf(function($value, \validity\Report $report) {
-                return (bool) $report->getFiltered("subscriptions");
-            }, "Email is required in case you want to subscribe for news")
+            Field::email("email")->setRequiredIf(
+                function($value, \validity\Report $report) {
+                    return (bool) $report->getFiltered("subscriptions");
+                },
+                "Email is required in case you want to subscribe for news"
+            )
         )->add(
             Field::date("date_of_birth")->setMax("-18years")->setRequired()
         )->add(
