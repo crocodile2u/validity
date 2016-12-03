@@ -20,7 +20,7 @@ if ($sent) {
             Field::int("subscriptions")->setMin(1)->expectArray()
         )->add(
             Field::email("email")->setRequiredIf(
-                function($value, \validity\Report $report) {
+                function(\validity\Report $report) {
                     return (bool) $report->getFiltered("subscriptions");
                 }
             )

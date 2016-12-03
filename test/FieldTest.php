@@ -287,8 +287,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testCallbackValidation()
     {
-        $F = Field::callback(
-            'key',
+        $F = Field::string('key')->addCallbackRule(
             function($name, $value, $message, Report $Result) {
                 if ($value === 'valid') {
                     return $value;
@@ -309,7 +308,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->expectException(\TypeError::class);
-        $F = Field::callback('key', 'non_existant_function');
+        $F = Field::string('key')->addCallbackRule('non_existant_function');
         $F->isValid($this->result('anything'));
     }
 

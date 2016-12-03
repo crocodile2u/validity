@@ -33,7 +33,7 @@ class Field
 
     private $default;
     private $defaultReplaceEmpty = false;
-    private $defaultReplaceIncorrect = false;
+    private $defaultReplaceInvalid = false;
 
     const INT = 0;
     const FLOAT = 1;
@@ -384,15 +384,15 @@ class Field
 
     /**
      * @param mixed $value
-     * @param bool $replace_empty
-     * @param bool $replace_incorrect
+     * @param bool $replaceEmpty
+     * @param bool $replaceInvalid
      * @return Field
      */
-    public function setDefault($value, $replace_empty = true, $replace_incorrect = false): Field
+    public function setDefault($value, $replaceEmpty = true, $replaceInvalid = false): Field
     {
         $this->default = $value;
-        $this->defaultReplaceEmpty = $replace_empty;
-        $this->defaultReplaceIncorrect = $replace_incorrect;
+        $this->defaultReplaceEmpty = $replaceEmpty;
+        $this->defaultReplaceInvalid = $replaceInvalid;
         return $this;
     }
 
@@ -411,7 +411,7 @@ class Field
      * @param array $messageData
      * @return Field
      */
-    public function addCallbackRule($callback, $message = null, $messageKey = null, array $messageData = []): Field
+    public function addCallbackRule(callable $callback, $message = null, $messageKey = null, array $messageData = []): Field
     {
         if (!is_callable($callback)) {
             throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
@@ -474,7 +474,7 @@ class Field
         $check = ($check && $this->setFilteredValue());
         if ($check) {
             return true;
-        } elseif ($this->defaultReplaceIncorrect) {
+        } elseif ($this->defaultReplaceInvalid) {
             $this->currentValue = $this->default;
             $this->report->resetErrors($this->name);
             $this->setFilteredValue();
@@ -618,7 +618,7 @@ class Field
     private function isRequiredByCondition()
     {
         return $this->requiredCallback
-            ? (bool) call_user_func_array($this->requiredCallback, array($this->currentValue, $this->report))
+            ? (bool) call_user_func_array($this->requiredCallback, array($this->report))
             : true;
     }
 

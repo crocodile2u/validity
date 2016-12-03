@@ -92,6 +92,26 @@ Assoc is a compound field, so _FieldSet_ will expect the value to be an array, w
 
 In all cases, _$message_ is used as error in case input cannot be interpreted as int, float etc.
 
+## Required fields
+
+Field can be marked as required:
+
+```php
+Field::string("username")->setRequired("Please enter username");
+```
+
+Sometimes, a field is only required in case some other fields are filled (or any other conditions are met)
+
+## Default values
+
+Every field can be assigned a default value:
+
+```php
+Field::int("price")->setDefault(100, true, false);
+```
+
+The two remaining arguments are _$replaceEmpty_ and _$replaceInvalid_. In case _$replaceEmpty_ is set to TRUE (default behavior), default value is used for the field in case no/empty value was specified in input. In case _$replaceInvalid_ is set to TRUE (defaults to FALSE), then, should the input value fail any validation, it is replaced silently with the default, and no error is raised.
+
 ## Simple constraints
 
 Numeric fields (int &amp; float), as well as Date/Datetime fields can be assigned minimum and maximum values:
@@ -120,6 +140,27 @@ Field::string("education")
 ```
 
 In the last case, _setMaxLength(100)_ limits the length of every string in the _education_ array, while _setArrayMinLength()_ and _setArrayMaxLength()_ set the limits for the array size.
+
+## Callbacks as validators
+
+This is the most powerful validation:
+
+```php
+Field::string("username")
+    ->addCallbackRule(
+        function($name, $value, $message, \validity\Report $Report) {
+            if (Users::usernameExists($value)) {
+                $Report->addError($name, "User already exists");
+            } else {
+                return $value;
+            }
+        }
+    );
+```
+
+## Dates
+
+Date and datetime fields will transform the input value to a formatted date, so when you finally call _getFiltered()_, all of them will contain "YYYY-MM-DD" or "YYYY-MM-DD HH:mm:ss". You may alter format for any field with _setDateFormat()_ and _setDatetimeFormat()_
 
 ## Labels
 
