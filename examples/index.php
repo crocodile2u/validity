@@ -8,20 +8,21 @@ $valid = true;
 $sent = isset($_GET["sent"]);
 $data = [];
 if ($sent) {
-    $fieldSet = (new FieldSet())
+    $langName = $_GET["language"] ?? "en";
+    $langClass = ("ru" == $langName) ? \validity\language\Ru::class : \validity\language\En::class;
+    $language = new $langClass();
+    $fieldSet = (new FieldSet($language))
         ->add(
-            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/", "Name must only contain latin letters and spaces, starting with a capital letter")
-                ->setRequired()
+            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/")->setRequired()
         )->add(
             Field::enum("greeting", ["mr", "mrs"])->setRequired()
         )->add(
-            Field::int("subscriptions", "Subscription ID is not an integer")->setMin(1)->expectArray()
+            Field::int("subscriptions")->setMin(1)->expectArray()
         )->add(
             Field::email("email")->setRequiredIf(
                 function($value, \validity\Report $report) {
                     return (bool) $report->getFiltered("subscriptions");
-                },
-                "Email is required in case you want to subscribe for news"
+                }
             )
         )->add(
             Field::date("date_of_birth")->setMax("-18years")->setRequired()
@@ -67,6 +68,15 @@ if ($sent) {
         <div class="row">
             <div class="col-sm-6">
                 <form class="form" method="get">
+                    <div class="form-group">
+                        <label class="control-label requred">Error messages language</label>
+                        <div>
+                            <select name="language" class="form-control">
+                                <option value="en">English</option>
+                                <option value="ru" <?php if ("ru" == $langName) echo "selected"; ?>>Russian</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="control-label required">Name (pattern /^[A-Z][a-zA-Z\- ]+$/)</label>
                         <div>

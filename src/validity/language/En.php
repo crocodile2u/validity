@@ -13,7 +13,7 @@ class En extends Language
         self::ILLEGAL_CHAR => "{label} contains illegal characters",
         self::INT => "{label} must be an integer",
         self::NUMBER_MIN => "{label} must have a minimum value of {min}",
-        self::NUMBER_MAX => "{label} must have a maximum value of  {max}",
+        self::NUMBER_MAX => "{label} must have a maximum value of {max}",
         self::STRING => "{label} must be a string",
         self::STRING_MIN_LEN => "{label} must have a minimum length of {min}",
         self::STRING_MAX_LEN => "{label} must have a maximum length of  {max}",
