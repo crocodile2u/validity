@@ -70,24 +70,28 @@ if ($fieldSet->isValid($_POST)) {
 }
 ```
 
-In this code example, no custom messages are used. Because the language is not specified for the _FieldSet_ contrustor, the default language class (English) will be used to provide pretty neat error messages. However, for every call that specifies a validation rule, you may supply a custom message, and it will then override the one from language pack. Messages can be provided in form of a template. _{label}_ is always replaced by the field's [label](#Labels).
+In this code example, no custom messages are used. Because the language is not specified for the _FieldSet_ contrustor, the default language class (English) will be used to provide pretty neat error messages. However, for every call that specifies a validation rule, you may supply a custom message, and it will then override the one from language pack. Messages can be provided in form of a template. _{label}_ is always replaced by the field's [label](#labels).
  
 ## Creating fields
 
 Fields are created using named constructors:
 
-* Field::int(string $name, string $message = null)
-* Field::float(string $name, string $message = null)
-* Field::bool(string $name, string $message = null)
-* Field::string(string $name, string $message = null)
-* Field::date(string $name, string $message = null)
-* Field::datetime(string $name, string $message = null)
-* Field::enum(string $name, array $values, string $message = null)
-* Field::email(string $name, string $message = null)
-* Field::phone(string $name, string $message = null)
-* Field::pattern(string $name, string $pattern, string $message = null)
-* Field::assoc(string $name, string $message = null)
+* Field::**int**(string $name, string $message = null),
+* Field::**float**(string $name, string $message = null),
+* Field::**bool**(string $name, string $message = null),
+* Field::**string**(string $name, string $message = null),
+* Field::**date**(string $name, string $message = null),
+* Field::**datetime**(string $name, string $message = null),
+* Field::**enum**(string $name, array $values, string $message = null),
+* Field::**email**(string $name, string $message = null),
+* Field::**phone**(string $name, string $message = null),
+* Field::**pattern**(string $name, string $pattern, string $message = null),
+* Field::**assoc**(string $name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ").
+
+Assoc is a compound field, so _FieldSet_ will expect the value to be an array, which it will validate with a help of _$innerFieldSet_. A working example: set of three fields used to make up a date input: _date\[year\]_, _date\[month\]_, _date\[day\]_. In this case, _$innerFieldSet_ will contain rules for _year_, _month_ and _day_. $message parameter to Field::**assoc**() will only be used in case when _date_ key of the validated array (i. e. _$\_POST_) is not an array. If it is an array, then the _$innerFieldSet_ will take care of further validation. However, if the _$innerFieldSet_ reports any errors, they will all be combined into a string and used as an error message for the _date_ field by the outer _FieldSet_.
+
+In all cases, _$message_ is used as error in case input cannot be interpreted as int, float etc.
 
 ## Labels
 
-Every field must have a name. Name is the first and required parameter to all the [named constructors](#Creating_fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
+Every field must have a name. Name is the first and required parameter to all the [named constructors](#creating-fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
