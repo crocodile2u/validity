@@ -92,6 +92,35 @@ Assoc is a compound field, so _FieldSet_ will expect the value to be an array, w
 
 In all cases, _$message_ is used as error in case input cannot be interpreted as int, float etc.
 
+## Simple constraints
+
+Numeric fields (int &amp; float), as well as Date/Datetime fields can be assigned minimum and maximum values:
+
+```php
+Field::int("price")->setMin(1);
+Field::date("date_of_birth")->setMax("-18years");
+```
+
+String values can be set to accept minumum and maximum string length:
+
+```php
+Field::string("name")
+    ->setMinLength(2)
+    ->setMaxLength(100);
+```
+
+In case an array is expected, it can also be limited:
+
+```php
+Field::string("education")
+    ->setMaxLength(100)
+    ->expectArray()
+    ->setArrayMinLength(0)
+    ->setArrayMaxLength(3)
+```
+
+In the last case, _setMaxLength(100)_ limits the length of every string in the _education_ array, while _setArrayMinLength()_ and _setArrayMaxLength()_ set the limits for the array size.
+
 ## Labels
 
 Every field must have a name. Name is the first and required parameter to all the [named constructors](#creating-fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
