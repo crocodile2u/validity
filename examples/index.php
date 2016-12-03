@@ -10,7 +10,7 @@ $data = [];
 if ($sent) {
     $fieldSet = (new FieldSet())
         ->add(
-            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/", "Name: only latin letters and spaces, starting with a capital letter")
+            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/", "Name must only contain latin letters and spaces, starting with a capital letter")
                 ->setRequired()
         )->add(
             Field::enum("greeting", ["mr", "mrs"])->setRequired()
@@ -65,7 +65,7 @@ if ($sent) {
     <div style="margin: 1em auto; width: 90%; max-width: 80em;" class="container panel panel-info">
         <h1>Validity example</h1>
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <form class="form" method="get">
                     <div class="form-group">
                         <label class="control-label required">Name (pattern /^[A-Z][a-zA-Z\- ]+$/)</label>
@@ -152,18 +152,25 @@ if ($sent) {
                     </div>
                 </form>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-6">
                 <div class="col-sm-12 well">
-                    <p>Error summary will appear below</p>
                     <?php if ($sent) : ?>
                         <?php if ($valid) : ?>
                             <p>Data is valid</p>
                         <?php else : ?>
+                            <p>Error summary as string (FieldSet->getErrors()->toString())</p>
                             <pre class="alert alert-danger"
                                  style="white-space: pre-wrap"><?=htmlspecialchars($fieldSet->getErrors()->toString())?></pre>
-                            <p>A more detailed report:</p>
+
+                            <p>Error summary as list (FieldSet->getErrors()->toPlainArray())</p>
+                            <ul class="alert alert-danger" style="list-style: none;">
+                                <?php foreach ($fieldSet->getErrors()->toPlainArray() as $field => $message) : ?>
+                                <li><b><?=$field?></b>: <?=htmlspecialchars($message, ENT_QUOTES)?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <p>Full error report (FieldSet->getErrors()->export())</p>
                             <pre class="alert alert-danger"
-                                 style="white-space: pre-wrap"><?=htmlspecialchars(json_encode($fieldSet->getErrors()->export()))?></pre>
+                                 style="white-space: pre-wrap"><?=htmlspecialchars(json_encode($fieldSet->getErrors()->export()), ENT_QUOTES)?></pre>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
