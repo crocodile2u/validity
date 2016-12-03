@@ -2,6 +2,18 @@
 
 > Validity is a simple validation and filtration package for PHP.
 
+## Why?
+
+The goal was simple: to have a reasonably small validation package that _easily_ covers all my needs:
+
+* validating basic data types, without having to type a lot,
+* validating arrays, validating against complex logic,
+* validating values depending on other fields' values,
+* easy filtering
+* easy internationalization, understandable error messages for all cases &mdash; out-of-the-box, with ability to specify custom message for each and every case
+
+
+
 ## Features
 
 * Basic field types: int, float, bool, string.
@@ -25,18 +37,17 @@ use \validity\FieldSet, \validity\Field;
 
 $fieldSet = (new FieldSet())
         ->add(
-            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/", "Name: only latin letters and spaces, starting with a capital letter")
+            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/")
                 ->setRequired()
         )->add(
             Field::enum("greeting", ["mr", "mrs"])->setRequired()
         )->add(
-            Field::int("subscriptions", "Subscription ID is not an integer")->setMin(1)->expectArray()
+            Field::int("subscriptions")->setMin(1)->expectArray()
         )->add(
             Field::email("email")->setRequiredIf(
                 function($value, \validity\Report $report) {
                     return (bool) $report->getFiltered("subscriptions");
-                },
-                "Email is required in case you want to subscribe for news"
+                }
             )
         )->add(
             Field::date("date_of_birth")->setMax("-18years")->setRequired()
@@ -59,3 +70,24 @@ if ($fieldSet->isValid($_POST)) {
 }
 ```
 
+In this code example, no custom messages are used. Because the language is not specified for the _FieldSet_ contrustor, the default language class (English) will be used to provide pretty neat error messages. However, for every call that specifies a validation rule, you may supply a custom message, and it will then override the one from language pack. Messages can be provided in form of a template. _{label}_ is always replaced by the field's [label](#Labels).
+ 
+## Creating fields
+
+Fields are created using named constructors:
+
+* Field::int(string $name, string $message = null)
+* Field::float(string $name, string $message = null)
+* Field::bool(string $name, string $message = null)
+* Field::string(string $name, string $message = null)
+* Field::date(string $name, string $message = null)
+* Field::datetime(string $name, string $message = null)
+* Field::enum(string $name, array $values, string $message = null)
+* Field::email(string $name, string $message = null)
+* Field::phone(string $name, string $message = null)
+* Field::pattern(string $name, string $pattern, string $message = null)
+* Field::assoc(string $name, string $message = null)
+
+## Labels
+
+Every field must have a name. Name is the first and required parameter to all the [named constructors](#Creating_fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.

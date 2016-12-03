@@ -119,17 +119,6 @@ class Field
 
     /**
      * @param string $name
-     * @param callable $callback
-     * @param string|null $message
-     * @return Field
-     */
-    public static function callback(string $name, callable $callback, $message = null): Field
-    {
-        return self::any($name)->addCallbackRule($callback, $message);
-    }
-
-    /**
-     * @param string $name
      * @param string|null $message
      * @return Field
      */
