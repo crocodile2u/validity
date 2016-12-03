@@ -4,10 +4,6 @@ namespace validity;
 
 class Field
 {
-    const DEFAULT_REQUIRED_MESSAGE = "%s field is required";
-    const DEFAULT_ARRAY_MESSAGE = "%s field is expected to be array";
-    const DEFAULT_SCALAR_MESSAGE = "%s field is expected to be scalar";
-    const DEFAULT_ILLEGAL_CHAR_MESSAGE = "%s field contains illegal character";
     const DEFAULT_DATE_FORMAT = "Y-m-d";
     const DEFAULT_DATETIME_FORMAT = "Y-m-d H:i:s";
     /**
@@ -27,6 +23,8 @@ class Field
     private $expectArrayMessage;
     private $arrayMinLength = 0;
     private $arrayMaxLength = null;
+    private $arrayMinMessage;
+    private $arrayMaxMessage;
     private $arraySkipEmpty = true;
     /**
      * @var Language|null
@@ -531,12 +529,24 @@ class Field
     }
 
     /**
-     * @param int $minLength
+     * @param int $threshold
+     * @param string $message
      */
-    public function limitArrayLength(int $min, int $max = 0)
+    public function setArrayMinLength(int $threshold, $message = null)
     {
-        $this->arrayMinLength = $min;
-        $this->arrayMaxLength = $max;
+        $this->arrayMinLength = $threshold;
+        $this->arrayMinMessage = $message;
+        return $this;
+    }
+
+    /**
+     * @param int $threshold
+     * @param string $message
+     */
+    public function setArrayMaxLength(int $threshold, $message = null)
+    {
+        $this->arrayMaxLength = $threshold;
+        $this->arrayMaxMessage = $message;
         return $this;
     }
 
@@ -636,12 +646,16 @@ class Field
             if ($this->arrayMinLength || $this->arrayMaxLength) {
                 $length = count($this->currentValue);
                 if ($this->arrayMinLength && ($length < $this->arrayMinLength)) {
-                    $this->addError($this->getArrayMessage());
+                    $this->addError(
+                        $this->smartMessage($this->arrayMinMessage, Language::ARRAY_MIN_LEN, ["min" => $this->arrayMinLength])
+                    );
                     return false;
                 }
 
                 if ($this->arrayMaxLength && ($length > $this->arrayMaxLength)) {
-                    $this->addError($this->getArrayMessage());
+                    $this->addError(
+                        $this->smartMessage($this->arrayMaxMessage, Language::ARRAY_MAX_LEN, ["max" => $this->arrayMaxLength])
+                    );
                     return false;
                 }
             }

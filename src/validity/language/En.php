@@ -29,5 +29,7 @@ class En extends Language
         self::ENUM_VALIDATION_FAILED => "{label} must be one of the following: {values}",
         self::DATE_MIN => "{label} must not be earlier than {min}",
         self::DATE_MAX => "{label} must not be later than {max}",
+        self::ARRAY_MIN_LEN => "{label} must have at least {min} elements",
+        self::ARRAY_MAX_LEN => "{label} must have at most {max} elements",
     ];
 }

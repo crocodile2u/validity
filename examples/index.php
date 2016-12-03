@@ -30,8 +30,14 @@ if ($sent) {
                 ->setMinLength(10)
                 ->setMaxLength(100)
                 ->expectArray()
-                ->limitArrayLength(0, 3)
+                ->setArrayMinLength(0)
+                ->setArrayMaxLength(3)
                 ->setArraySkipEmpty(true)
+        )->add(
+            Field::bool("xmas_wish")
+                ->expectArray()
+                ->setArrayMinLength(0)
+                ->setArrayMaxLength(2)
         );
 
     $valid = $fieldSet->isValid($_GET);
@@ -123,6 +129,22 @@ if ($sent) {
                             <input name="education[]" class="form-control"
                                    value="<?=$data["education"][2] ?? ""; ?>"
                                    placeholder="School #3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label requred">Christmas wishes, select maximum 2 (array of booleans, with string keys)</label>
+                        <?php $xmas = $data["xmas_wish"] ?? []; ?>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="xmas_wish[xbox]"
+                                          value="1" <?php if (isset($xmas["xbox"])) echo "checked"; ?>>X-box</label>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="xmas_wish[playstation]"
+                                          value="1" <?php if (isset($xmas["playstation"])) echo "checked"; ?>>Playstation</label>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="xmas_wish[lego_mindstorm]"
+                                          value="1" <?php if (isset($xmas["lego_mindstorm"])) echo "checked"; ?>>Lego mindstorm</label>
                         </div>
                     </div>
                     <div class="form-group">

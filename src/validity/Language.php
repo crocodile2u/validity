@@ -27,7 +27,9 @@ abstract class Language
         REGEXP_VALIDATION_FAILED = 19,
         ENUM_VALIDATION_FAILED = 20,
         DATE_MIN = 21,
-        DATE_MAX = 22;
+        DATE_MAX = 22,
+        ARRAY_MIN_LEN = 23,
+        ARRAY_MAX_LEN = 24;
     /**
      * @var self
      */
