@@ -95,6 +95,6 @@ abstract class Language
             },
             $template
         );
-        return mb_strtoupper(mb_substr($message, 0, 1)) . mb_substr($message, 1);
+        return $message;
     }
 }

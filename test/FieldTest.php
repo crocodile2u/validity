@@ -308,7 +308,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             __METHOD__ . ": callback validation must not accept invalid value"
         );
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         $F = Field::callback('key', 'non_existant_function');
         $F->isValid($this->result('anything'));
     }

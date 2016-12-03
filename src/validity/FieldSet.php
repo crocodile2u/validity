@@ -58,4 +58,14 @@ class FieldSet
     {
         return $this->lastReport()->getRaw($key);
     }
+
+    /**
+     * Get filtered values for correctly filled data plus raw values for those that contain errors.
+     * @param string $key
+     * @return array
+     */
+    public function getMixed($key = null)
+    {
+        return $this->lastReport()->getMixed($key);
+    }
 }

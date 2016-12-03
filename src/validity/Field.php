@@ -78,7 +78,7 @@ class Field
     );
 
     /** @var Report */
-    private $Report;
+    private $report;
     private $currentValue;
     private $valueExists = false;
     private $valueEmpty = true;
@@ -93,7 +93,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function int($name, $message = null)
+    public static function int(string $name, $message = null): Field
     {
         return new self($name, self::INT, $message);
     }
@@ -103,7 +103,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function float($name, $message = null)
+    public static function float(string $name, $message = null): Field
     {
         return new self($name, self::FLOAT, $message);
     }
@@ -113,7 +113,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function bool($name, $message = null)
+    public static function bool(string $name, $message = null): Field
     {
         return new self($name, self::BOOLEAN, $message);
     }
@@ -124,7 +124,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function callback($name, $callback, $message = null)
+    public static function callback(string $name, callable $callback, $message = null): Field
     {
         return self::any($name)->addCallbackRule($callback, $message);
     }
@@ -134,7 +134,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function string($name, $message = null)
+    public static function string(string $name, $message = null): Field
     {
         return new self($name, self::STRING, $message);
     }
@@ -143,21 +143,29 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function date($name, $message = null)
+    public static function date(string $name, $message = null): Field
     {
-        return self::createDateField($name, self::DATE, $message, "dateFormat");
+        return self::createDateField($name, self::DATE, $message, "dateFormat", Language::DATE_EXPECTED);
     }
     /**
      * @param string $name
      * @param string|null $message
      * @return Field
      */
-    public static function datetime($name, $message = null)
+    public static function datetime(string $name, $message = null): Field
     {
-        return self::createDateField($name, self::DATETIME, $message, "datetimeFormat");
+        return self::createDateField($name, self::DATETIME, $message, "datetimeFormat", Language::DATETIME_EXPECTED);
     }
 
-    private static function createDateField($name, $type, $message, $formatProperty)
+    /**
+     * @param string $name
+     * @param int $type
+     * @param string $message
+     * @param string $formatProperty
+     * @param int $messageKey
+     * @return Field
+     */
+    private static function createDateField(string $name, int $type, $message, string $formatProperty, int $messageKey): Field
     {
         $field = new self($name, $type, $message);
         $callback = (function($name, $value, $message, Report $Result) use ($field, $formatProperty) {
@@ -167,7 +175,7 @@ class Field
                 return date($field->$formatProperty, $ts);
             }
         });
-        return $field->addCallbackRule($callback, $message);
+        return $field->addCallbackRule($callback, $message, $messageKey);
     }
 
     /**
@@ -176,7 +184,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public static function enum($name, $values, $message = null)
+    public static function enum(string $name, array $values, $message = null): Field
     {
         return (new self($name, self::ANY, null))->addCallbackRule(
             function($name, $value, $message, Report $Result) use ($values) {
@@ -186,34 +194,61 @@ class Field
                     return $Result->addError($name, $message);
                 }
             },
-            $message
+            $message,
+            Language::ENUM_VALIDATION_FAILED,
+            ["values" => join(", ", $values)]
         );
     }
 
-    public static function email($name, $message = null)
+    /**
+     * @param string $name
+     * @param string $message
+     * @return Field
+     */
+    public static function email(string $name, $message = null): Field
     {
         return (new self($name, self::STRING, null))->addRegexpRule(
             "~^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}\~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$~",
-            $message
+            $message,
+            Language::EMAIL_EXPECTED
         );
     }
 
-    public static function phone($name, $minLength = 7, $message = null)
+    /**
+     * @param string $name
+     * @param int $minLength
+     * @param string $message
+     * @return Field
+     */
+    public static function phone(string $name, $minLength = 7, $message = null): Field
     {
 
          return (new self($name, self::STRING, null))->addFilter(
             function($value) {
                 return preg_replace('/[+() -]/', '', $value);
             }
-        )->addRegexpRule('/^\d{' . $minLength . ',20}$/', $message);
+        )->addRegexpRule('/^\d{' . $minLength . ',20}$/', $message, Language::PHONE_EXPECTED);
     }
 
-    public static function pattern($name, $pattern, $message = null)
+    /**
+     * @param string $name
+     * @param string $pattern
+     * @param string $message
+     * @return Field
+     */
+    public static function pattern(string $name, string $pattern, $message = null): Field
     {
         return (new self($name, self::STRING, null))->addRegexpRule($pattern, $message);
     }
 
-    public static function assoc($name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ")
+    /**
+     * @param string $name
+     * @param FieldSet $innerFieldSet
+     * @param null $message
+     * @param string $errorSeparator
+     * @return Field
+     */
+    public static function assoc(string $name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; "): Field
     {
         return (new self($name, self::ANY, null))->addCallbackRule(
             function($name, $value, $message, Report $Report) use ($innerFieldSet, $errorSeparator) {
@@ -236,11 +271,17 @@ class Field
      * @param $name string
      * @return Field
      */
-    public static function any($name)
+    public static function any($name): Field
     {
         return new self($name, self::ANY, null);
     }
 
+    /**
+     * Field constructor.
+     * @param $name
+     * @param $type
+     * @param $typeMessage
+     */
     protected function __construct($name, $type, $typeMessage)
     {
         $this->name = $name;
@@ -270,7 +311,7 @@ class Field
      * @param Language $language
      * @return Field
      */
-    public function setLanguage(Language $language)
+    public function setLanguage(Language $language): Field
     {
         $this->language = $language;
         return $this;
@@ -279,7 +320,7 @@ class Field
     /**
      * @return Language
      */
-    public function getLanguage()
+    public function getLanguage(): Language
     {
         return $this->language ?: Language::getInstance();
     }
@@ -289,7 +330,7 @@ class Field
      * @param string $message
      * @return Field
      */
-    public function setMin($min, $message = null)
+    public function setMin($min, $message = null): Field
     {
         return $this->addRule([self::MIN, $message, $min]);
     }
@@ -299,7 +340,7 @@ class Field
      * @param string $message
      * @return Field
      */
-    public function setMax($max, $message = null)
+    public function setMax($max, $message = null): Field
     {
         return $this->addRule([self::MAX, $message, $max]);
     }
@@ -309,7 +350,7 @@ class Field
      * @param string $message
      * @return Field
      */
-    public function setMinLength($length, $message = null)
+    public function setMinLength($length, $message = null): Field
     {
         return $this->addRule([self::MIN_LENGTH, $message, $length]);
     }
@@ -319,7 +360,7 @@ class Field
      * @param string $message
      * @return Field
      */
-    public function setMaxLength($length, $message = null)
+    public function setMaxLength($length, $message = null): Field
     {
         return $this->addRule([self::MAX_LENGTH, $message, $length]);
     }
@@ -350,7 +391,7 @@ class Field
      * @param bool $replace_incorrect
      * @return Field
      */
-    public function setDefault($value, $replace_empty = true, $replace_incorrect = false)
+    public function setDefault($value, $replace_empty = true, $replace_incorrect = false): Field
     {
         $this->default = $value;
         $this->defaultReplaceEmpty = $replace_empty;
@@ -358,6 +399,9 @@ class Field
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
@@ -367,9 +411,10 @@ class Field
      * @param callable $callback
      * @param string|null $message
      * @param int $messageKey
+     * @param array $messageData
      * @return Field
      */
-    public function addCallbackRule($callback, $message = null, $messageKey = Language::FIELD_FAILED_VALIDATION)
+    public function addCallbackRule($callback, $message = null, $messageKey = null, array $messageData = []): Field
     {
         if (!is_callable($callback)) {
             throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
@@ -378,14 +423,14 @@ class Field
                 return null;
             };
         }
-        return $this->addRule(array(self::CALLBACK, $message, $callback, $messageKey));
+        return $this->addRule(array(self::CALLBACK, $message, $callback, $messageKey, $messageData));
     }
 
     /**
      * @param callable $callback
      * @return Field
      */
-    public function addFilter($callback)
+    public function addFilter($callback): Field
     {
         if (is_callable($callback)) {
             $this->filters[] = $callback;
@@ -401,7 +446,7 @@ class Field
      * @param int $messageKey
      * @return Field
      */
-    public function addRegexpRule($regexp, $message = null, $messageKey = Language::REGEXP_VALIDATION_FAILED)
+    public function addRegexpRule($regexp, $message = null, $messageKey = Language::REGEXP_VALIDATION_FAILED): Field
     {
         return $this->addCallbackRule(
             function($name, $value, $message, Report $Report) use ($regexp) {
@@ -420,9 +465,9 @@ class Field
      * @param Report $Report
      * @return bool
      */
-    public function isValid(Report $Report)
+    public function isValid(Report $Report): bool
     {
-        $this->Report = $Report;
+        $this->report = $Report;
         $this->currentValue = $this->extractValue();
         $check = $this->checkRequired();
         $check = ($check && $this->checkArray());
@@ -434,11 +479,10 @@ class Field
             return true;
         } elseif ($this->defaultReplaceIncorrect) {
             $this->currentValue = $this->default;
-            $this->Report->resetErrors($this->name);
+            $this->report->resetErrors($this->name);
             $this->setFilteredValue();
             return true;
         } else {
-            $this->Report->setFiltered($this->name, null);
             return false;
         }
     }
@@ -447,7 +491,7 @@ class Field
      * @param string|null $message
      * @return Field
      */
-    public function setRequired($message = null)
+    public function setRequired($message = null): Field
     {
         $this->required = true;
         $this->requiredMessage = $message;
@@ -458,12 +502,14 @@ class Field
      * @param bool|callable $condition
      * @param null $message
      * @return $this
+     * @throws \InvalidArgumentException
      */
-    public function setRequiredIf($condition, $message = null)
+    public function setRequiredIf($condition, $message = null): Field
     {
         if (is_bool($condition)) {
             $this->required = $condition;
         } elseif (is_callable($condition)) {
+            $this->required = true;
             $this->requiredCallback = $condition;
         } else {
             throw new \InvalidArgumentException(__METHOD__ . ' expects 1st argument to be NULL, boolean or a valid callback');
@@ -478,7 +524,7 @@ class Field
      * @param int|null $maxLength
      * @return Field
      */
-    public function expectArray($message = null, $minLength = 0, $maxLength = null)
+    public function expectArray($message = null, $minLength = 0, $maxLength = null): Field
     {
         $this->expectArray = true;
         $this->arrayMinLength = $minLength;
@@ -490,13 +536,16 @@ class Field
      * @param array $spec
      * @return Field
      */
-    protected function addRule($spec)
+    protected function addRule($spec): Field
     {
         $this->rules[] = $spec;
         return $this;
     }
 
-    private function checkRequired()
+    /**
+     * @return bool
+     */
+    private function checkRequired(): bool
     {
         if (!$this->valueExists) {
             $ret = false;
@@ -531,21 +580,28 @@ class Field
             return true;
         } elseif (!$this->required) {
             return true;
-        } elseif (!$this->checkRequiredCondition()) {
+        } elseif (!$this->isRequiredByCondition()) {
             return true;
         } else {
-            return $this->addError($this->smartMessage($this->requiredMessage, Language::REQUIRED));
+            $this->addError($this->smartMessage($this->requiredMessage, Language::REQUIRED));
+            return false;
         }
     }
 
-    private function checkRequiredCondition()
+    /**
+     * @return bool
+     */
+    private function isRequiredByCondition()
     {
         return $this->requiredCallback
-            ? call_user_func_array($this->requiredCallback, array($this->currentValue, $this->Report))
+            ? (bool) call_user_func_array($this->requiredCallback, array($this->currentValue, $this->report))
             : true;
     }
 
-    private function checkArray()
+    /**
+     * @return bool|null
+     */
+    private function checkArray(): bool
     {
         if (null === $this->currentValue) {
             return true;
@@ -553,32 +609,43 @@ class Field
 
         if ($this->expectArray) {
             if (!is_array($this->currentValue)) {
-                return $this->addError($this->getArrayMessage());
+                $this->addError($this->getArrayMessage());
+                return false;
             }
 
             if ($this->arrayMinLength || $this->arrayMaxLength) {
                 $length = count($this->currentValue);
                 if ($this->arrayMinLength && ($length < $this->arrayMinLength)) {
-                    return $this->addError($this->getArrayMessage());
+                    $this->addError($this->getArrayMessage());
+                    return false;
                 }
 
                 if ($this->arrayMaxLength && ($length > $this->arrayMaxLength)) {
-                    return $this->addError($this->getArrayMessage());
+                    $this->addError($this->getArrayMessage());
+                    return false;
                 }
             }
 
             return true;
         } elseif (in_array($this->type, self::$arrays)) {
             if (!is_array($this->currentValue)) {// value MUST BE an array
-                return $this->addError($this->getArrayMessage());
+                $this->addError($this->getArrayMessage());
+                return false;
             }
         } elseif (!in_array($this->type, self::$allowArrays) && !is_scalar($this->currentValue)) {// value MUST BE a scalar
-            return $this->addError($this->predefinedMessage(Language::SCALAR_EXPECTED));
+            $this->addError($this->predefinedMessage(Language::SCALAR_EXPECTED));
+            return false;
         }
 
         return true;
     }
 
+    /**
+     * @param $value
+     * @param $message
+     * @param $args
+     * @return array|null
+     */
     private function checkAssoc($value, $message, $args)
     {
         if (empty($args)) {
@@ -603,7 +670,10 @@ class Field
         }
     }
 
-    private function checkRules()
+    /**
+     * @return bool
+     */
+    private function checkRules(): bool
     {
         if ($this->valueEmpty) {
             return true;
@@ -622,18 +692,24 @@ class Field
         return true;
     }
 
-    private function checkType()
+    /**
+     * @return bool
+     */
+    private function checkType(): bool
     {
         return $this->checkSingleRule($this->type, $this->typeMessage, []);
     }
 
+    /**
+     * @return mixed
+     */
     private function extractValue()
     {
         $this->valueExists = false;
         $this->valueEmpty = true;
-        $data = $this->Report->getRaw();
+        $data = $this->report->getRaw();
         if (!is_array($data)) {
-            $this->Report->addError($this->name, "Data is not an array");
+            $this->report->addError($this->name, "Data is not an array");
             return null;
         }
         if (array_key_exists($this->name, $data)) {
@@ -644,11 +720,19 @@ class Field
         }
     }
 
+    /**
+     * @param $message
+     * @return null
+     */
     private function addError($message)
     {
-        return $this->Report->addError($this->name, $message);
+        return $this->report->addError($this->name, $message);
     }
 
+    /**
+     * @param $value
+     * @return array|string
+     */
     public function filterValue($value)
     {
         if (is_string($value)) {
@@ -676,16 +760,23 @@ class Field
         }
 
         if ($this->expectArray) {
+            $ret = true;
+            $validValues = [];
             foreach ($this->currentValue as $key => &$value) {
                 $value = $this->$method($value, $message, $args, $key);
-                if (!$this->Report->isOk($this->name)) {
-                    return false;
+                if (null === $value) {
+                    $ret = false;
+                } else {
+                    $validValues[$key] = $value;
                 }
             }
+            $this->report->setFiltered($this->name, $validValues);
+            return $ret;
         } else {
             $this->currentValue = $this->$method($this->currentValue, $message, $args, $this->name);
+            $this->report->setFiltered($this->name, $this->currentValue);
         }
-        return $this->Report->isOk($this->name);
+        return $this->report->isOk($this->name);
     }
 
     private function checkInt($value, $message)
@@ -744,8 +835,9 @@ class Field
     {
         $callback = array_shift($args);
         $messageKey = array_shift($args) ?: Language::FIELD_FAILED_VALIDATION;
-        $message = $this->smartMessage($message, $messageKey);
-        return call_user_func_array($callback, [$this->name, $value, $message, $this->Report, $key]);
+        $messageData = array_shift($args) ?: [];
+        $message = $this->smartMessage($message, $messageKey, $messageData);
+        return call_user_func_array($callback, [$this->name, $value, $message, $this->report, $key]);
     }
 
     private function checkString($value, $message, $args)
@@ -838,7 +930,7 @@ class Field
 
     private function setFilteredValue()
     {
-        $this->Report->setFiltered($this->name, $this->currentValue);
+        $this->report->setFiltered($this->name, $this->currentValue);
         return true;
     }
 

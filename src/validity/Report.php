@@ -66,4 +66,23 @@ class Report
     {
         return (null === $key) ? $this->raw : (isset($this->raw[$key]) ? $this->raw[$key] : null);
     }
+
+    /**
+     * Get filtered values for correctly filled data plus raw values for those that contain errors.
+     * @param string $key
+     * @return array
+     */
+    public function getMixed($key = null)
+    {
+        if (null === $key) {
+            $filtered = array_filter($this->filtered, function($value) {
+                return null !== $value;
+            });
+            return $filtered + $this->raw;
+        } elseif (isset($this->errorSet[$key])) {
+            return $this->getRaw($key);
+        } else {
+            return $this->getFiltered($key);
+        }
+    }
 }
