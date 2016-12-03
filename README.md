@@ -45,7 +45,8 @@ $fieldSet = (new FieldSet())
                 ->setMinLength(10)
                 ->setMaxLength(100)
                 ->expectArray()
-                ->limitArrayLength(0, 3)
+                ->setArrayMinLength(0)
+                ->setArrayMaxLength(3)
                 ->setArraySkipEmpty(true)
         );
 
