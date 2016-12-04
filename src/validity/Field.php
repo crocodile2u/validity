@@ -2,6 +2,15 @@
 
 namespace validity;
 
+use validity\field\Assoc;
+use validity\field\Boolean;
+use validity\field\Date;
+use validity\field\Datetime;
+use validity\field\Double;
+use validity\field\Enum;
+use validity\field\Integer;
+use validity\field\Str;
+
 class Field
 {
     const DEFAULT_DATE_FORMAT = "Y-m-d";
@@ -18,7 +27,8 @@ class Field
     private $required = false;
     private $requiredMessage;
     private $requiredCallback;
-    private $typeMessage;
+    protected $typeMessage;
+    protected $typeMessageKey;
     private $expectArray = false;
     private $expectArrayMessage;
     private $arrayMinLength = 0;
@@ -52,22 +62,6 @@ class Field
 
     private $rules = array();
 
-    private static $checkMethodMap = array(
-        self::INT => 'checkInt',
-        self::STRING => 'checkString',
-        self::DATE => 'checkString',
-        self::DATETIME => 'checkString',
-        self::CALLBACK => 'checkCallback',
-        self::BOOLEAN => 'checkBoolean',
-        self::FLOAT => 'checkFloat',
-        self::ENUM => 'checkEnum',
-        self::ASSOC => 'checkAssoc',
-        self::MIN => 'checkMinRange',
-        self::MAX => 'checkMaxRange',
-        self::MIN_LENGTH => 'checkMinLength',
-        self::MAX_LENGTH => 'checkMaxLength',
-    );
-
     private static $arrays = array(
         self::ASSOC,
     );
@@ -84,108 +78,73 @@ class Field
 
     private $filters = array();
 
-    private $dateFormat = self::DEFAULT_DATE_FORMAT;
-    private $datetimeFormat = self::DEFAULT_DATETIME_FORMAT;
-
     /**
      * @param string $name
      * @param string|null $message
-     * @return Field
+     * @return Integer
      */
-    public static function int(string $name, $message = null): Field
+    public static function int(string $name, $message = null): Integer
     {
-        return new self($name, self::INT, $message);
+        return new Integer($name, $message);
     }
 
     /**
      * @param string $name
      * @param string|null $message
-     * @return Field
+     * @return Double
      */
-    public static function float(string $name, $message = null): Field
+    public static function float(string $name, $message = null): Double
     {
-        return new self($name, self::FLOAT, $message);
+        return new Double($name, $message);
     }
 
     /**
      * @param string $name
      * @param string|null $message
-     * @return Field
+     * @return Boolean
      */
-    public static function bool(string $name, $message = null): Field
+    public static function bool(string $name, $message = null): Boolean
     {
-        return new self($name, self::BOOLEAN, $message);
+        return new Boolean($name, $message);
     }
 
     /**
      * @param string $name
      * @param string|null $message
-     * @return Field
+     * @return Str
      */
-    public static function string(string $name, $message = null): Field
+    public static function string(string $name, $message = null): Str
     {
-        return new self($name, self::STRING, $message);
+        return new Str($name, $message);
     }
     /**
      * @param string $name
      * @param string|null $message
-     * @return Field
+     * @return Date
      */
-    public static function date(string $name, $message = null): Field
+    public static function date(string $name, $message = null): Date
     {
-        return self::createDateField($name, self::DATE, $message, "dateFormat", Language::DATE_EXPECTED);
+        return new Date($name, $message);
     }
     /**
      * @param string $name
      * @param string|null $message
-     * @return Field
+     * @return Datetime
      */
-    public static function datetime(string $name, $message = null): Field
+    public static function datetime(string $name, $message = null): Datetime
     {
-        return self::createDateField($name, self::DATETIME, $message, "datetimeFormat", Language::DATETIME_EXPECTED);
-    }
-
-    /**
-     * @param string $name
-     * @param int $type
-     * @param string $message
-     * @param string $formatProperty
-     * @param int $messageKey
-     * @return Field
-     */
-    private static function createDateField(string $name, int $type, $message, string $formatProperty, int $messageKey): Field
-    {
-        $field = new self($name, $type, $message);
-        $callback = (function($name, $value, $message, Report $Result) use ($field, $formatProperty) {
-            if (false === ($ts = strtotime($value))) {
-                return $Result->addError($name, $message);
-            } else {
-                return date($field->$formatProperty, $ts);
-            }
-        });
-        return $field->addCallbackRule($callback, $message, $messageKey);
+        return new Datetime($name, $message);
     }
 
     /**
      * @param string $name
      * @param array $values
      * @param string|null $message
-     * @return Field
+     * @return Enum
      */
-    public static function enum(string $name, array $values, $message = null): Field
+    public static function enum(string $name, array $values, $message = null): Enum
     {
-        return (new self($name, self::ANY, null))->addCallbackRule(
-            function($name, $value, $message, Report $Result) use ($values) {
-                if (in_array($value, $values)) {
-                    return $value;
-                } else {
-                    return $Result->addError($name, $message);
-                }
-            },
-            $message,
-            Language::ENUM_VALIDATION_FAILED,
-            ["values" => join(", ", $values)]
-        );
+        return new Enum($name, $values, $message);
     }
 
     /**
@@ -193,9 +152,9 @@ class Field
      * @param string $message
      * @return Field
      */
-    public static function email(string $name, $message = null): Field
+    public static function email(string $name, $message = null): Str
     {
-        return (new self($name, self::STRING, null))->addRegexpRule(
+        return (new Str($name, null))->addRegexpRule(
             "~^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}\~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$~",
             $message,
             Language::EMAIL_EXPECTED
@@ -206,12 +165,11 @@ class Field
      * @param string $name
      * @param int $minLength
      * @param string $message
-     * @return Field
+     * @return Str
      */
-    public static function phone(string $name, $minLength = 7, $message = null): Field
+    public static function phone(string $name, $minLength = 7, $message = null): Str
     {
-
-         return (new self($name, self::STRING, null))->addFilter(
+         return (new Str($name, null))->addFilter(
             function($value) {
                 return preg_replace('/[+() -]/', '', $value);
             }
@@ -222,11 +180,11 @@ class Field
      * @param string $name
      * @param string $pattern
      * @param string $message
-     * @return Field
+     * @return Str
      */
-    public static function pattern(string $name, string $pattern, $message = null): Field
+    public static function pattern(string $name, string $pattern, $message = null): Str
     {
-        return (new self($name, self::STRING, null))->addRegexpRule($pattern, $message);
+        return (new Str($name, null))->addRegexpRule($pattern, $message);
     }
 
     /**
@@ -234,25 +192,11 @@ class Field
      * @param FieldSet $innerFieldSet
      * @param null $message
      * @param string $errorSeparator
-     * @return Field
+     * @return Assoc
      */
-    public static function assoc(string $name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; "): Field
+    public static function assoc(string $name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; "): Assoc
     {
-        return (new self($name, self::ANY, null))->addCallbackRule(
-            function($name, $value, $message, Report $Report) use ($innerFieldSet, $errorSeparator) {
-                if (!is_array($value)) {
-                    return $Report->addError($name, $message);
-                }
-
-                if ($innerFieldSet->isValid($value)) {
-                    return $innerFieldSet->getFiltered();
-                } else {
-                    $errors = join($errorSeparator, $innerFieldSet->getErrors()->toPlainArray($errorSeparator));
-                    return $Report->addError($name, $errors);
-                }
-            },
-            $message
-        );
+        return new Assoc($name, $innerFieldSet, $message, $errorSeparator);
     }
 
     /**
@@ -275,6 +219,18 @@ class Field
         $this->name = $name;
         $this->type = $type;
         $this->typeMessage = $typeMessage;
+        $this->addRule(
+            function($name, $value, $message, Report $report) {
+                $value = $this->castToType($value);
+                if (null === $value) {
+                    return $report->addError($name, $message);
+                } else {
+                    return $value;
+                }
+            },
+            $typeMessage,
+            $this->typeMessageKey
+        );
     }
 
     /**
@@ -323,66 +279,6 @@ class Field
     }
 
     /**
-     * @param mixed $min
-     * @param string $message
-     * @return Field
-     */
-    public function setMin($min, $message = null): Field
-    {
-        return $this->addRule([self::MIN, $message, $min]);
-    }
-
-    /**
-     * @param mixed $max
-     * @param string $message
-     * @return Field
-     */
-    public function setMax($max, $message = null): Field
-    {
-        return $this->addRule([self::MAX, $message, $max]);
-    }
-
-    /**
-     * @param mixed $length
-     * @param string $message
-     * @return Field
-     */
-    public function setMinLength($length, $message = null): Field
-    {
-        return $this->addRule([self::MIN_LENGTH, $message, $length]);
-    }
-
-    /**
-     * @param mixed $max
-     * @param string $message
-     * @return Field
-     */
-    public function setMaxLength($length, $message = null): Field
-    {
-        return $this->addRule([self::MAX_LENGTH, $message, $length]);
-    }
-
-    /**
-     * @param string $dateFormat
-     * @return Field
-     */
-    public function setDateFormat(string $dateFormat): Field
-    {
-        $this->dateFormat = $dateFormat;
-        return $this;
-    }
-
-    /**
-     * @param string $datetimeFormat
-     * @return Field
-     */
-    public function setDatetimeFormat(string $datetimeFormat): Field
-    {
-        $this->datetimeFormat = $datetimeFormat;
-        return $this;
-    }
-
-    /**
      * @param mixed $value
      * @param bool $replaceEmpty
      * @param bool $replaceInvalid
@@ -405,22 +301,23 @@ class Field
     }
 
     /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * @param callable $callback
      * @param string|null $message
      * @param int $messageKey
      * @param array $messageData
      * @return Field
      */
-    public function addCallbackRule(callable $callback, $message = null, $messageKey = null, array $messageData = []): Field
+    public function addCallbackRule(callable $callback, $message = null): Field
     {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
-            $callback = function($name, $value, $message, Report $Report) {
-                $Report->addError($name, $message);
-                return null;
-            };
-        }
-        return $this->addRule(array(self::CALLBACK, $message, $callback, $messageKey, $messageData));
+        return $this->addRule($callback, $message);
     }
 
     /**
@@ -438,27 +335,6 @@ class Field
     }
 
     /**
-     * @param string|$regexp
-     * @param string|null $message
-     * @param int $messageKey
-     * @return Field
-     */
-    public function addRegexpRule($regexp, $message = null, $messageKey = Language::REGEXP_VALIDATION_FAILED): Field
-    {
-        return $this->addCallbackRule(
-            function($name, $value, $message, Report $Report) use ($regexp) {
-                if (preg_match($regexp, $value)) {
-                    return $value;
-                } else {
-                    return $Report->addError($name, $message);
-                }
-            },
-            $message,
-            $messageKey
-        );
-    }
-
-    /**
      * @param Report $Report
      * @return bool
      */
@@ -469,7 +345,7 @@ class Field
         $check = $this->checkRequired();
         $check = ($check && $this->checkArray());
         $check = ($check && $this->applyFilters());
-        $check = ($check && $this->checkType());
+//        $check = ($check && $this->castToType());
         $check = ($check && $this->checkRules());
         $check = ($check && $this->setFilteredValue());
         if ($check) {
@@ -556,13 +432,26 @@ class Field
         $this->arraySkipEmpty = $flag;
         return $this;
     }
+
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     * @return int
+     */
+    protected function compareValues($a, $b)
+    {
+        return $a <=> $b;
+    }
     /**
      * @param array $spec
-     * @return Field
+     * @return $this
      */
-    protected function addRule($spec): Field
+    protected function addRule(callable $callback, $message = null, $messageKey = null, array $messageData = []): Field
     {
-        $this->rules[] = $spec;
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
+        }
+        $this->rules[] = [$callback, $message, $messageKey, $messageData];
         return $this;
     }
 
@@ -673,36 +562,6 @@ class Field
     }
 
     /**
-     * @param $value
-     * @param $message
-     * @param $args
-     * @return array|null
-     */
-    private function checkAssoc($value, $message, $args)
-    {
-        if (empty($args)) {
-            $error_message = "Validator misconfiguration: expecting DataValidator for a field of type ASSOC";
-            return $this->addError($error_message);
-        }
-
-        if (!is_array($value)) {
-            return $this->addError($this->predefinedMessage(Language::ARRAY_EXPECTED));
-        }
-
-        /** @var FieldSet $Validator */
-        $Validator = $args[0];
-        if ($Validator->isValid($value)) {
-            return $Validator->getFiltered();
-        } else {
-            $errors = $Validator->getErrors();
-            if (!empty($args[1])) {// 2nd arg is "merge_errors". Where TRUE, all errors are merged into a single string
-                $errors = join("; ", $errors);
-            }
-            return $this->addError($errors);
-        }
-    }
-
-    /**
      * @return bool
      */
     private function checkRules(): bool
@@ -712,10 +571,8 @@ class Field
         }
 
         foreach ($this->rules as $spec) {
-            $type = array_shift($spec);
-            $message = array_shift($spec);
-            $args = $spec;
-            $check = $this->checkSingleRule($type, $message, $args);
+            list($callback, $message, $messageKey, $messageData) = $spec;
+            $check = $this->checkSingleRule($callback, $message, $messageKey, $messageData);
             if (!$check) {
                 return false;
             }
@@ -725,14 +582,11 @@ class Field
     }
 
     /**
-     * @return bool
+     * @return mixed
      */
-    private function checkType(): bool
+    protected function castToType($value)
     {
-        if ($this->valueEmpty) {
-            return true;
-        }
-        return $this->checkSingleRule($this->type, $this->typeMessage, []);
+        return $value;
     }
 
     /**
@@ -759,7 +613,7 @@ class Field
      * @param $message
      * @return null
      */
-    private function addError($message)
+    protected function addError($message)
     {
         return $this->report->addError($this->name, $message);
     }
@@ -787,18 +641,13 @@ class Field
         }
     }
 
-    private function checkSingleRule($type, $message, $args)
+    private function checkSingleRule(callable $callback, $message, $messageKey, $messageData)
     {
-        $method = self::$checkMethodMap[$type] ?? null;
-        if (!$method) {
-            return true;
-        }
-
         if ($this->expectArray) {
             $ret = true;
             $validValues = [];
             foreach ($this->currentValue as $key => &$value) {
-                $value = $this->$method($value, $message, $args, $key);
+                $value = $this->checkCallback($value, $callback, $message, $messageKey, $messageData, $key);
                 if (null === $value) {
                     $ret = false;
                 } else {
@@ -808,151 +657,18 @@ class Field
             $this->report->setFiltered($this->name, $validValues);
             return $ret;
         } else {
-            $this->currentValue = $this->$method($this->currentValue, $message, $args, $this->name);
+            $this->currentValue = $this->checkCallback($this->currentValue, $callback, $message, $messageKey, $messageData);
             $this->report->setFiltered($this->name, $this->currentValue);
         }
         return $this->report->isOk($this->name);
     }
 
-    private function checkInt($value, $message)
+    private function checkCallback($value, $callback, $message, $messageKey, $messageData, $key = null)
     {
-        if ($value && ($value[0] === '+')) {
-            $value = mb_substr($value, 1);
-        }
-        if ($value !== '') {
-            $value = ltrim($value, '0');
-            if ($value === '') {
-                $value = '0';
-            }
-        }
-        if ('' === $value) {
-            $value = '0';
-        }
-        if ((string)(int)$value !== $value) {
-            return $this->addError($this->smartMessage($message, Language::INT));
-        }
-        return (int)$value;
-    }
-
-    private function checkFloat($value, $message)
-    {
-        $value = str_replace([',', ' '], ['.', ''], $value);
-        if (!is_numeric($value)) {
-            return $this->addError($this->smartMessage($message, Language::FLOAT));
-        }
-        return (float)$value;
-    }
-
-    private function checkBoolean($value, $message)
-    {
-        if (is_bool($value)) {
-            return $value;
-        } elseif (is_numeric($value) && ((1 == $value) || (0 == $value))) {
-            return (bool)$value;
-        } else {
-            $bool_str = strtoupper($value);
-
-            $yes = ['YES', 'ON', 'TRUE'];
-            if (in_array($bool_str, $yes)) {
-                return true;
-            }
-
-            $no = ['NO', 'OFF', 'FALSE'];
-            if (in_array($bool_str, $no)) {
-                return false;
-            }
-        }
-
-        return $this->addError($this->smartMessage($message, Language::BOOL));
-    }
-
-    private function checkCallback($value, $message, $args, $key)
-    {
-        $callback = array_shift($args);
-        $messageKey = array_shift($args) ?: Language::FIELD_FAILED_VALIDATION;
-        $messageData = array_shift($args) ?: [];
+        $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
+        $messageData = $messageData ?: [];
         $message = $this->smartMessage($message, $messageKey, $messageData);
         return call_user_func_array($callback, [$this->name, $value, $message, $this->report, $key]);
-    }
-
-    private function checkString($value, $message, $args)
-    {
-        if (!is_string($value)) {
-            return $this->addError($this->smartMessage($message, Language::STRING));
-        }
-        $filteredValue = mb_convert_encoding($value, 'utf-8', 'utf-8');
-        if ($filteredValue !== $value) {
-            return $this->addError($this->predefinedMessage(Language::ILLEGAL_CHAR));
-        }
-        return $value;
-    }
-
-    private function checkEnum($value, $message, $args)
-    {
-        $values = reset($args);
-        if (in_array($value, $values)) {
-            return $value;
-        } else {
-            return $this->addError($this->smartMessage($message, Language::ENUM_VALIDATION_FAILED));
-        }
-    }
-
-    private function checkMinRange($value, $message, $args)
-    {
-        $threshold = $args[0];
-        switch ($this->type) {
-            case self::INT:
-            case self::FLOAT:
-                $template = Language::NUMBER_MIN;
-                $valid = ($value >= $threshold);
-                break;
-            case self::DATE:
-            case self::DATETIME:
-                $template = Language::DATE_MIN;
-                $valid = (strtotime($value) >= $this->toTimestamp($threshold));
-                break;
-            default:
-                throw new \LogicException("Minimum rule is only applicable to numbers and dates");
-        }
-        return $valid ? $value : $this->addError($this->smartMessage($message, $template, ["min" => $threshold]));
-    }
-
-    private function checkMaxRange($value, $message, $args)
-    {
-        $threshold = $args[0];
-        switch ($this->type) {
-            case self::INT:
-            case self::FLOAT:
-            $template = Language::NUMBER_MAX;
-                $valid = ($value <= $threshold);
-                break;
-            case self::DATE:
-            case self::DATETIME:
-                $template = Language::DATE_MAX;
-                $valid = (strtotime($value) <= $this->toTimestamp($threshold));
-                break;
-            default:
-                throw new \LogicException("Maximum rule is only applicable to numbers and dates");
-        }
-        return $valid ? $value : $this->addError($this->smartMessage($message, $template, ["max" => $threshold]));
-    }
-
-    private function checkMinLength($value, $message, $args)
-    {
-        if (mb_strlen($value) < $args[0]) {
-            return $this->addError($this->smartMessage($message, Language::STRING_MIN_LEN, ["min" => $args[0]]));
-        } else {
-            return $value;
-        }
-    }
-
-    private function checkMaxLength($value, $message, $args)
-    {
-        if (mb_strlen($value) > $args[0]) {
-            return $this->addError($this->smartMessage($message, Language::STRING_MAX_LEN, ["max" => $args[0]]));
-        } else {
-            return $value;
-        }
     }
 
     private function getArrayMessage()
@@ -995,37 +711,30 @@ class Field
         return $ret;
     }
 
-    private function toTimestamp($spec)
-    {
-        if (null === $spec) {
-            return null;
-        } elseif (is_int($spec)) {
-            return $spec;
-        } elseif ($spec instanceof \DateTime) {
-            return $spec->getTimestamp();
-        } elseif (is_string($spec)) {
-            if ($ts = strtotime($spec)) {
-                return $ts;
-            } else {
-                throw new \InvalidArgumentException("Cannot convert {label} to timestamp");
-            }
-        }
-    }
-
-    private function smartMessage($template, $key, array $data = [])
+    protected function smartMessage($template, $key, array $data = [])
     {
         return $template
             ? $this->arbitraryMessage($template, $data)
             : $this->predefinedMessage($key, $data);
     }
 
-    private function arbitraryMessage($template, array $data = [])
+    protected function arbitraryMessage($template, array $data = [])
     {
         return $this->getLanguage()->message($template, $data + ["label" => $this->getLabel()]);
     }
 
-    private function predefinedMessage($key, array $data = [])
+    protected function predefinedMessage($key, array $data = [])
     {
         return $this->getLanguage()->translate($key, $data + ["label" => $this->getLabel()]);
+    }
+
+    /**
+     * @param int $type
+     * @return $this
+     */
+    protected function setType($type)
+    {
+        $this->type = $type;
+        return $this;
     }
 }
