@@ -6,7 +6,8 @@ class Date extends Timestamp
 {
     use Range;
 
-    const DEFAULT_FORMAT = "Y-m-d";
+    const DEFAULT_OUTPUT_FORMAT = "Y-m-d";
+    const DEFAULT_INPUT_FORMAT = "d.m.Y";
 
     protected function __construct($name, $typeMessage)
     {
@@ -14,14 +15,13 @@ class Date extends Timestamp
     }
 
     /**
-     * @param mixed $a
-     * @param mixed $b
+     * @param mixed $value
      * @return int
      */
-    protected function compareValues($a, $b): int
+    protected function compareWith($value): int
     {
-        $tsA = $this->toTimestamp($a);
-        $tsB = $this->toTimestamp($b);
+        $tsA = $this->datetimeValue->getTimestamp();
+        $tsB = $this->toTimestamp($value);
         return ((int) date("Ymd", $tsA)) <=> ((int) date("Ymd", $tsB));
     }
 }

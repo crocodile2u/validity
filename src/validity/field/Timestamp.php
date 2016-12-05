@@ -6,31 +6,73 @@ abstract class Timestamp extends Str
 {
     use Range;
 
-    const DEFAULT_FORMAT = "";
+    const DEFAULT_OUTPUT_FORMAT = "";
+    const DEFAULT_INPUT_FORMAT = "";
 
-    protected $format;
+    protected $outputFormat;
+    protected $inputFormat;
+    protected $inputFormatStrict = true;
+    /**
+     * @var \DateTimeZone
+     */
+    protected $timezone;
+    /**
+     * @var \DateTime
+     */
+    protected $datetimeValue;
 
     protected function __construct($name, $typeMessage, $refinedType)
     {
         parent::__construct($name, $typeMessage);
         $this->setType($refinedType);
-        $this->format = static::DEFAULT_FORMAT;
+        $this->outputFormat = static::DEFAULT_OUTPUT_FORMAT;
+        $this->inputFormat = static::DEFAULT_INPUT_FORMAT;
     }
 
-    public function setFormat($format)
+    public function setOutputFormat($outputFormat)
     {
-        $this->format = $format;
+        $this->outputFormat = $outputFormat;
+        return $this;
+    }
+
+    public function setInputFormat($inputFormat, $strict = true)
+    {
+        $this->inputFormat = $inputFormat;
+        $this->inputFormatStrict = $strict;
+        return $this;
+    }
+
+    /**
+     * @param \DateTimeZone $timezone
+     * @return Timestamp
+     */
+    public function setTimezone(\DateTimeZone $timezone): Timestamp
+    {
+        $this->timezone = $timezone;
         return $this;
     }
 
     protected function castToType($value)
     {
-        $str = parent::castToType($value);
+        $value = parent::castToType($value);
         if (!trim($value)) {
             return null;
         }
-        $ts = strtotime($str);
-        return $ts ? date($this->format, $ts) : null;
+        $datetime = \DateTime::createFromFormat($this->inputFormat, $value, $this->timezone);
+        if ($datetime) {
+            $this->datetimeValue = $datetime;
+            return $datetime->format($this->outputFormat);
+        } elseif ($this->inputFormatStrict) {
+            return null;
+        } else {
+            $datetime = date_create($value);
+            if ($datetime) {
+                $this->datetimeValue = $datetime;
+                return $datetime->format($this->outputFormat);
+            } else {
+                return null;
+            }
+        }
     }
 
     protected function toTimestamp($spec)
@@ -48,10 +90,5 @@ abstract class Timestamp extends Str
                 throw new \InvalidArgumentException("Cannot convert {$this->getName()} to timestamp");
             }
         }
-    }
-
-    protected function preFilterStringValue($value)
-    {
-        return $value;
     }
 }

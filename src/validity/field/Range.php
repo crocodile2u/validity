@@ -24,8 +24,8 @@ trait Range
     {
         /** @var Field $this */
         return $this->addRule(
-            function($value) use ($min) {
-                if ($this->compareValues($value, $min) < 0) {
+            function() use ($min) {
+                if ($this->compareWith($min) < 0) {
                     return false;
                 } else {
                     return true;
@@ -45,11 +45,11 @@ trait Range
     public function setMax($max, $message = null): Field
     {
         return $this->addRule(
-            function($value) use ($max) {
-                if ($this->compareValues($value, $max) > 0) {
+            function() use ($max) {
+                if ($this->compareWith($max) > 0) {
                     return false;
                 } else {
-                    return $value;
+                    return true;
                 }
             },
             $message,
@@ -58,5 +58,5 @@ trait Range
         );
     }
 
-    abstract protected function compareValues($a, $b): int;
+    abstract protected function compareWith($value): int;
 }

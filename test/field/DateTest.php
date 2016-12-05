@@ -7,27 +7,37 @@ use validity\test\BaseFieldTest;
 
 class DateTest extends BaseFieldTest
 {
-    /**
-     * @param string $input
-     * @param string $filtered
-     * @dataProvider provider_testValidDates
-     */
-    function testValidDates($input, $filtered)
+    function testValidDate()
     {
-        $this->assertValid(["key" => $input], Field::date("key"), $filtered);
+        $this->assertValid(["key" => "01.01.2010"], Field::date("key"), "2010-01-01");
     }
-    function provider_testValidDates()
+    function testValidDateWithCustomFormat()
     {
-        return [
-            ["+1year", date("Y-m-d", strtotime("+1year"))],
-            ["-1year", date("Y-m-d", strtotime("-1year"))],
-            ["2010-01-01", "2010-01-01"],
-            ["2010-06", "2010-06-01"],
-            ["06/05/2010", "2010-06-05"],
-        ];
+        $field = Field::date("key")->setInputFormat("d/m/Y")->setOutputFormat("d.m.Y");
+        $this->assertValid(["key" => "01/01/2010"], $field, "01.01.2010");
+    }
+    function testNonStrictInputMode()
+    {
+        $field = Field::date("key")->setInputFormat("d/m/Y", false);
+        $this->assertValid(["key" => "2010-01-01"], $field, "2010-01-01");
     }
     function testInvalidDates()
     {
-        $this->assertInvalid(["key" => " "], Field::date("key"));
+        $this->assertInvalid(["key" => " "], Field::date("key")->setRequired(), "");
+        $this->assertInvalid(["key" => "invalid date"], Field::date("key"));
+        $this->assertInvalid(["key" => "2001-02-30"], Field::date("key"));
+    }
+    function testRangeValidation()
+    {
+        $field = Field::date("key")
+            ->setInputFormat("d.m.Y")
+            ->setOutputFormat("Y-m-d")
+            ->setMin("2010-01-01")
+            ->setMax("2010-01-31");
+        $this->assertValid(["key" => "01.01.2010"], $field, "2010-01-01");
+        $this->assertValid(["key" => "31.01.2010"], $field, "2010-01-31");
+        $this->assertValid(["key" => "20.01.2010"], $field, "2010-01-20");
+        $this->assertInvalid(["key" => "31.12.2009"], $field);
+        $this->assertInvalid(["key" => "01.02.2010"], $field);
     }
 }

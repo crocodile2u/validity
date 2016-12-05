@@ -13,10 +13,10 @@ abstract class BaseFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field->isValid($report), $message);
         $this->assertEquals($filtered, $report->getFiltered($field->getName()), "Filtered value is incorrect");
     }
-    protected function assertInvalid($data, Field $field, $message = null)
+    protected function assertInvalid($data, Field $field, $filtered = null, $message = null)
     {
         $report = new Report($data);
         $this->assertFalse($field->isValid($report), $message);
-        $this->assertNull($report->getFiltered($field->getName()), "Filtered value should be NULL");
+        $this->assertSame($filtered, $report->getFiltered($field->getName()), "Filtered value should be NULL");
     }
 }

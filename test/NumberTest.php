@@ -19,7 +19,7 @@ abstract class NumberTest extends BaseFieldTest
         if ($isValid) {
             $this->assertValid(["key" => $input], $field, $filtered, $message);
         } else {
-            $this->assertInvalid(["key" => $input], $field, $message);
+            $this->assertInvalid(["key" => $input], $field, null, $message);
         }
     }
     abstract function provider_testIsValid();
@@ -39,7 +39,7 @@ abstract class NumberTest extends BaseFieldTest
         if ($isValid) {
             $this->assertValid(["key" => $value], $field, $filtered, $message);
         } else {
-            $this->assertInvalid(["key" => $value], $field, $message);
+            $this->assertInvalid(["key" => $value], $field, null, $message);
         }
     }
     abstract function provider_testRangeValidation();

@@ -37,12 +37,11 @@ class Integer extends Field implements RangeAware
     }
 
     /**
-     * @param mixed $a
-     * @param mixed $b
+     * @param mixed $value
      * @return int
      */
-    protected function compareValues($a, $b): int
+    protected function compareWith($value): int
     {
-        return $a <=> $b;
+        return $this->currentValue <=> $value;
     }
 }

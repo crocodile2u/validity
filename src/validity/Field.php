@@ -72,7 +72,7 @@ class Field
 
     /** @var Report */
     private $report;
-    private $currentValue;
+    protected $currentValue;
     private $valueExists = false;
     private $valueEmpty = true;
 
