@@ -36,11 +36,11 @@ class Str extends Field
     public function setMinLength($length, $message = null): Str
     {
         return $this->addRule(
-            function($name, $value, $message, Report $Report) use ($length) {
+            function($value) use ($length) {
                 if (mb_strlen($value) < $length) {
-                    return $Report->addError($name, $message);
+                    return false;
                 } else {
-                    return $value;
+                    return true;
                 }
             },
             $message,
@@ -57,11 +57,11 @@ class Str extends Field
     public function setMaxLength($length, $message = null): Str
     {
         return $this->addRule(
-            function($name, $value, $message, Report $Report) use ($length) {
+            function($value) use ($length) {
                 if (mb_strlen($value) > $length) {
-                    return $Report->addError($name, $message);
+                    return false;
                 } else {
-                    return $value;
+                    return true;
                 }
             },
             $message,
@@ -79,11 +79,11 @@ class Str extends Field
     public function addRegexpRule($regexp, $message = null, $messageKey = Language::REGEXP_VALIDATION_FAILED): Field
     {
         return $this->addRule(
-            function($name, $value, $message, Report $Report) use ($regexp) {
+            function($value) use ($regexp) {
                 if (preg_match($regexp, $value)) {
-                    return $value;
+                    return true;
                 } else {
-                    return $Report->addError($name, $message);
+                    return false;
                 }
             },
             $message,

@@ -132,12 +132,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         );
 
         $F = Field::assoc('key', $Validator)->addCallbackRule(
-            function($name, $value, $message, Report $Result) {
+            function($value) {
                 if ($value === ['nested_key' => 'valid']) {
-                    return $value;
+                    return true;
                 } else {
-                    $Result->addError($name, $message);
-                    return null;
+                    return false;
                 }
             }
         );
@@ -163,8 +162,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
         $int = '  10  ';
         $Result = $this->result($int);
-        $this->assertTrue($F->isValid($Result), __METHOD__ . ": valid integer surrounded by spaces fails validation");
-        $this->assertEquals((int)$int, $Result->getFiltered('key'), __METHOD__ . ": incorrect filtered value");
+        $this->assertFalse($F->isValid($Result), __METHOD__ . ": integer surrounded by spaces passes validation");
 
         // incorrect format for integer
         $this->assertFalse($F->isValid($this->result('asdf')), __METHOD__ . ": string passes integer validation");
@@ -288,11 +286,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     public function testCallbackValidation()
     {
         $F = Field::string('key')->addCallbackRule(
-            function($name, $value, $message, Report $Result) {
+            function($value) {
                 if ($value === 'valid') {
                     return $value;
                 } else {
-                    $Result->addError($name, $message);
+                    return false;
                 }
             }
         );
@@ -342,12 +340,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         // integer 15 - 20 is accepted
         $callback_threshold = 15;
         $F->addCallbackRule(
-            function($name, $value, $message, Report $Result) use ($callback_threshold) {
+            function($value) use ($callback_threshold) {
                 if ($value < $callback_threshold) {
-                    $Result->addError($name, $message);
-                    return null;
+                    return false;
                 } else {
-                    return $value;
+                    return true;
                 }
             }
         );

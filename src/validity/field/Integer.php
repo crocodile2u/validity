@@ -19,7 +19,7 @@ class Integer extends Field implements RangeAware
     protected function castToType($value)
     {
         if ($value && ($value[0] === '+')) {
-            $value = mb_substr($value, 1);
+            $value = substr($value, 1);
         }
         if ($value !== '') {
             $value = ltrim($value, '0');
@@ -34,5 +34,10 @@ class Integer extends Field implements RangeAware
             return null;
         }
         return (int)$value;
+    }
+
+    protected function preFilterStringValue($value)
+    {
+        return $value;
     }
 }

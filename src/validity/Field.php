@@ -220,12 +220,13 @@ class Field
         $this->type = $type;
         $this->typeMessage = $typeMessage;
         $this->addRule(
-            function($name, $value, $message, Report $report) {
+            function($value, Report $report) {
                 $value = $this->castToType($value);
                 if (null === $value) {
-                    return $report->addError($name, $message);
+                    return false;
                 } else {
-                    return $value;
+                    $report->setFiltered($this->getName(), $value);
+                    return true;
                 }
             },
             $typeMessage,
@@ -345,7 +346,6 @@ class Field
         $check = $this->checkRequired();
         $check = ($check && $this->checkArray());
         $check = ($check && $this->applyFilters());
-//        $check = ($check && $this->castToType());
         $check = ($check && $this->checkRules());
         $check = ($check && $this->setFilteredValue());
         if ($check) {
@@ -356,6 +356,7 @@ class Field
             $this->setFilteredValue();
             return true;
         } else {
+            $this->setFilteredValue();
             return false;
         }
     }
@@ -625,7 +626,7 @@ class Field
     public function filterValue($value)
     {
         if (is_string($value)) {
-            $trimmed = trim($value);
+            $trimmed = $this->preFilterStringValue($value);
             if ($this->valueEmpty) {
                 $this->valueEmpty = (0 == strlen($trimmed));
             }
@@ -637,8 +638,18 @@ class Field
             return $value;
         } else {
             $this->valueEmpty = false;
-            return array_map(array($this, 'filterValue'), $value);
+            return array_map(
+                function($value) {
+                    return $this->filterValue($value);
+                },
+                $value
+            );
         }
+    }
+
+    protected function preFilterStringValue($value)
+    {
+        return trim($value);
     }
 
     private function checkSingleRule(callable $callback, $message, $messageKey, $messageData)
@@ -668,7 +679,12 @@ class Field
         $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
         $messageData = $messageData ?: [];
         $message = $this->smartMessage($message, $messageKey, $messageData);
-        return call_user_func_array($callback, [$this->name, $value, $message, $this->report, $key]);
+        $result = call_user_func_array($callback, [$value, $this->report, $key]);
+        if ($result) {
+            return $this->report->getFiltered($this->name);
+        } else {
+            return $this->report->addError($this->name, $message);
+        }
     }
 
     private function getArrayMessage()

@@ -12,11 +12,11 @@ class Enum extends Field
     {
         parent::__construct($name, self::ANY, null);
         $this->addRule(
-            function($name, $value, $message, Report $Result) use ($values) {
+            function($value) use ($values) {
                 if (in_array($value, $values)) {
-                    return $value;
+                    return true;
                 } else {
-                    return $Result->addError($name, $message);
+                    return false;
                 }
             },
             $message,
