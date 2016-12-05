@@ -26,6 +26,9 @@ abstract class Timestamp extends Str
     protected function castToType($value)
     {
         $str = parent::castToType($value);
+        if (!trim($value)) {
+            return null;
+        }
         $ts = strtotime($str);
         return $ts ? date($this->format, $ts) : null;
     }
@@ -45,5 +48,10 @@ abstract class Timestamp extends Str
                 throw new \InvalidArgumentException("Cannot convert {$this->getName()} to timestamp");
             }
         }
+    }
+
+    protected function preFilterStringValue($value)
+    {
+        return $value;
     }
 }

@@ -4,8 +4,6 @@ namespace validity\test;
 
 use validity\Field;
 
-require_once __DIR__ . "/BaseFieldTest.php";
-
 abstract class NumberTest extends BaseFieldTest
 {
     /**
