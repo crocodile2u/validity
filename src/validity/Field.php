@@ -617,11 +617,11 @@ class Field
     public function filterValue($value)
     {
         if (is_string($value)) {
-            $trimmed = $this->preFilterStringValue($value);
+            $preFiltered = $this->preFilterStringValue($value);
             if ($this->valueEmpty) {
-                $this->valueEmpty = (0 == strlen($trimmed));
+                $this->valueEmpty = (0 == strlen($preFiltered));
             }
-            return $trimmed;
+            return $preFiltered;
         } elseif (is_scalar($value)) {
             $this->valueEmpty = false;
             return $value;
@@ -640,7 +640,7 @@ class Field
 
     protected function preFilterStringValue($value)
     {
-        return trim($value);
+        return $value;
     }
 
     private function checkSingleRule(callable $callback, $message, $messageKey, $messageData)

@@ -3,28 +3,12 @@
 namespace validity\test\field;
 
 use validity\Field;
-use validity\test\BaseFieldTest;
+use validity\test\NumberTest;
 
-require_once __DIR__ . "/../BaseFieldTest.php";
+require_once __DIR__ . "/../NumberTest.php";
 
-class IntTest extends BaseFieldTest
+class IntegerTest extends NumberTest
 {
-    /**
-     * @param mixed $input
-     * @param bool $isValid
-     * @param int $filtered
-     * @param string $message
-     * @dataProvider provider_testIsValid
-     */
-    function testIsValid($input, $isValid, $filtered, $message)
-    {
-        $field = Field::int("key");
-        if ($isValid) {
-            $this->assertValid(["key" => $input], $field, $filtered, $message);
-        } else {
-            $this->assertInvalid(["key" => $input], $field, $message);
-        }
-    }
     function provider_testIsValid()
     {
         return [
@@ -38,26 +22,11 @@ class IntTest extends BaseFieldTest
             ["0xFF", false, null, "hexadecimal notation passes integer validation"],
             ["9223372036854775810", false, null, "too big integer passes integer validation"],
             ["-9223372036854775810", false, null, "too big negative integer passes integer validation"],
+            ["-1000", true, -1000, "signed valid integer fails validation"],
+            ["+1000", true, 1000, "signed valid integer fails validation"],
+            ["0001234", true, 1234, "valid integer fails validation"],
+            ["0", true, 0, "valid integer fails validation"],
         ];
-    }
-
-    /**
-     * @param int $min
-     * @param int $max
-     * @param mixed $value
-     * @param bool $isValid
-     * @param int $filtered
-     * @param string $message
-     * @dataProvider provider_testRangeValidation
-     */
-    function testRangeValidation($min, $max, $value, $isValid, $filtered, $message)
-    {
-        $field = Field::int("key")->setMin($min)->setMax($max);
-        if ($isValid) {
-            $this->assertValid(["key" => $value], $field, $filtered, $message);
-        } else {
-            $this->assertInvalid(["key" => $value], $field, $message);
-        }
     }
     function provider_testRangeValidation()
     {
@@ -67,5 +36,9 @@ class IntTest extends BaseFieldTest
             [100, 200, '150', true, 150, "valid integer fails validation"],
             [100, 200, '1500', false, null, "out-of-bounds integer value passes validation"],
         ];
+    }
+    protected function createField(): Field
+    {
+        return Field::int("key");
     }
 }

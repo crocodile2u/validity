@@ -36,11 +36,6 @@ class Integer extends Field implements RangeAware
         return (int)$value;
     }
 
-    protected function preFilterStringValue($value)
-    {
-        return $value;
-    }
-
     /**
      * @param mixed $a
      * @param mixed $b

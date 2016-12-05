@@ -90,4 +90,9 @@ class Str extends Field
             $messageKey
         );
     }
+
+    protected function preFilterStringValue($value)
+    {
+        return trim($value);
+    }
 }

@@ -18,7 +18,25 @@ class Double extends Field
      */
     protected function castToType($value)
     {
-        $value = str_replace([',', ' '], ['.', ''], $value);
+        if (is_string($value)) {
+            if ("+" === $value[0]) {
+                $value = substr($value, 1);
+            }
+            $value = ltrim($value, '0');
+            $value = str_replace(',', '.', $value);
+            if (substr_count($value, ".")) {
+                if ("." === $value[0]) {
+                    $value = "0" . $value;
+                }
+                $value = rtrim($value, '0.');
+            }
+            if ("" === $value) {
+                $value = "0";
+            }
+            if (((string) (float) $value) !== $value) {
+                return null;
+            }
+        }
         if (!is_numeric($value)) {
             return null;
         }
