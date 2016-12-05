@@ -57,7 +57,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field->isValid($Result), __METHOD__ . ": value should pass validation");
         $this->assertEquals('default', $Result->getFiltered('key'), __METHOD__ . ": default value be used if value is missing");
 
-        $Result = $this->result('   ');
+        $Result = $this->result('');
         $this->assertTrue($field->isValid($Result), __METHOD__ . ": value should pass validation");
         $this->assertEquals('default', $Result->getFiltered('key'), __METHOD__ . ": default value should be used if value is empty");
 
