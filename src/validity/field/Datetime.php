@@ -18,7 +18,7 @@ class Datetime extends Timestamp
      * @param mixed $b
      * @return int
      */
-    protected function compareValues($a, $b)
+    protected function compareValues($a, $b): int
     {
         return $this->toTimestamp($a) <=> $this->toTimestamp($b);
     }

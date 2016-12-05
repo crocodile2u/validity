@@ -435,15 +435,6 @@ class Field
     }
 
     /**
-     * @param mixed $a
-     * @param mixed $b
-     * @return int
-     */
-    protected function compareValues($a, $b)
-    {
-        return $a <=> $b;
-    }
-    /**
      * @param array $spec
      * @return $this
      */

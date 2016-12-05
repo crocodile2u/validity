@@ -6,8 +6,6 @@ use validity\Field;
 
 class Boolean extends Field
 {
-    use Range;
-
     protected function __construct($name, $typeMessage)
     {
         parent::__construct($name, self::BOOLEAN, $typeMessage);

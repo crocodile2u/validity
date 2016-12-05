@@ -40,4 +40,14 @@ class Integer extends Field implements RangeAware
     {
         return $value;
     }
+
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     * @return int
+     */
+    protected function compareValues($a, $b): int
+    {
+        return $a <=> $b;
+    }
 }

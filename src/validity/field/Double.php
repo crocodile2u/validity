@@ -24,4 +24,14 @@ class Double extends Field
         }
         return (float)$value;
     }
+
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     * @return int
+     */
+    protected function compareValues($a, $b): int
+    {
+        return $a <=> $b;
+    }
 }

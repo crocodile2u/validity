@@ -57,4 +57,6 @@ trait Range
             ["max" => $max]
         );
     }
+
+    abstract protected function compareValues($a, $b): int;
 }
