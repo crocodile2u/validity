@@ -148,7 +148,7 @@ Field::string("education")
     ->setArrayMaxLength(3)
 ```
 
-In the last case, _setMaxLength(100)_ limits the length of every string in the _education_ array, while _setArrayMinLength()_ and _setArrayMaxLength()_ set the limits for the array size.
+In the last case, _setMaxLength(100)_ limits the length of every string in the _education_ array, while _setArrayMinLength()_ and _setArrayMaxLength()_ set the limits for the array size (so we expect from 0 to 3 entries in education, each entry being a string with a maximum length of 100 chars).
 
 ## Callbacks as validators
 

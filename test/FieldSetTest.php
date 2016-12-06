@@ -11,6 +11,7 @@ class FieldSetTest extends \PHPUnit_Framework_TestCase
     public function testCheck()
     {
         $V = new FieldSet();
+
         $V->add(new StubFieldPass())
             ->add(new StubFieldFail());
 
