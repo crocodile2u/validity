@@ -1,6 +1,6 @@
 # Validity
 
-> Validity is a simple validation and filtration package for PHP.
+> Validity is a simple validation and filtration package for PHP. It can be used to validate both single values like integers and strings, and complex nested structures, using however complex validation logic you can think of. Nice default errors messages in English or Russian. Easily extensible with a custom language package, with always having ability to provide a custom error message for any rule on every field.
 
 ## Why?
 
