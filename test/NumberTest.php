@@ -17,9 +17,9 @@ abstract class NumberTest extends BaseFieldTest
     {
         $field = $this->createField();
         if ($isValid) {
-            $this->assertValid(["key" => $input], $field, $filtered, $message);
+            $this->assertValid($input, $field, $filtered, $message);
         } else {
-            $this->assertInvalid(["key" => $input], $field, null, $message);
+            $this->assertInvalid($input, $field, null, $message);
         }
     }
     abstract function provider_testIsValid();
@@ -37,9 +37,9 @@ abstract class NumberTest extends BaseFieldTest
     {
         $field = $this->createField()->setMin($min)->setMax($max);
         if ($isValid) {
-            $this->assertValid(["key" => $value], $field, $filtered, $message);
+            $this->assertValid($value, $field, $filtered, $message);
         } else {
-            $this->assertInvalid(["key" => $value], $field, null, $message);
+            $this->assertInvalid($value, $field, null, $message);
         }
     }
     abstract function provider_testRangeValidation();
@@ -47,7 +47,7 @@ abstract class NumberTest extends BaseFieldTest
     function testZeroIsConsideredValidEvenForRequiredField()
     {
         $field = $this->createField()->setRequired();
-        $this->assertValid(["key" => 0], $field, 0, "zero value fails integer validation (required)");
+        $this->assertValid(0, $field, 0, "zero value fails integer validation (required)");
     }
 
     abstract protected function createField(): Field;

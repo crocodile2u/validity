@@ -18,7 +18,9 @@ class MessageSet extends \ArrayObject
     }
     function reset($field)
     {
-        unset($this[$field]);
+        if ($this->offsetExists($field)) {
+            $this->offsetUnset($field);
+        }
     }
     function export()
     {

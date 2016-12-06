@@ -3,20 +3,17 @@
 namespace validity\test;
 
 use validity\Field;
-use validity\Report;
 
 abstract class BaseFieldTest extends \PHPUnit_Framework_TestCase
 {
     protected function assertValid($data, Field $field, $filtered, $message = null)
     {
-        $report = new Report($data);
-        $this->assertTrue($field->isValid($report), $message);
-        $this->assertEquals($filtered, $report->getFiltered($field->getName()), "Filtered value is incorrect");
+        $this->assertTrue($field->isValid($data), $message);
+        $this->assertEquals($filtered, $field->getFiltered(), "Filtered value is incorrect");
     }
     protected function assertInvalid($data, Field $field, $filtered = null, $message = null)
     {
-        $report = new Report($data);
-        $this->assertFalse($field->isValid($report), $message);
-        $this->assertSame($filtered, $report->getFiltered($field->getName()), "Filtered value should be NULL");
+        $this->assertFalse($field->isValid($data), $message);
+        $this->assertSame($filtered, $field->getFiltered(), "Filtered value should be NULL");
     }
 }

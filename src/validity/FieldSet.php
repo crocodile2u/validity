@@ -14,22 +14,23 @@ class FieldSet
     public function __construct(Language $language = null)
     {
         $this->language = $language ?: Language::createDefault();
+        $this->lastReport = new Report([]);
     }
 
     /**
-     * @param Field $Field
+     * @param Field $field
      * @return FieldSet
      */
-    public function add(Field $Field): FieldSet
+    public function add(Field $field): FieldSet
     {
-        $this->fields[] = $Field->setLanguageIfNotYet($this->language);
+        $this->fields[] = $field->setOwnerFieldSet($this);
         return $this;
     }
 
     /**
      * @return Report
      */
-    public function lastReport(): Report
+    public function getLastReport(): Report
     {
         return $this->lastReport;
     }
@@ -41,10 +42,17 @@ class FieldSet
     public function isValid($data): bool
     {
         $this->lastReport = new Report($data);
-        foreach ($this->fields as $Field) {
-            $Field->isValid($this->lastReport);
+        $ret = true;
+        foreach ($this->fields as $field) {
+            $name = $field->getName();
+            if ($this->lastReport->inputKeyExists($name)) {
+                $value = $this->lastReport->getRaw($field->getName());
+                $ret = ($ret && $field->isValid($value));
+            } else {
+                $ret = $field->checkRequired(null) && $ret;
+            }
         }
-        return $this->lastReport->isOk();
+        return $ret;
     }
 
     /**
@@ -53,17 +61,17 @@ class FieldSet
      */
     public function getFiltered($key = null)
     {
-        return $this->lastReport()->getFiltered($key);
+        return $this->lastReport->getFiltered($key);
     }
 
     public function getErrors($key = null)
     {
-        return $this->lastReport()->getErrors($key);
+        return $this->lastReport->getErrors($key);
     }
 
     public function getRaw($key = null)
     {
-        return $this->lastReport()->getRaw($key);
+        return $this->lastReport->getRaw($key);
     }
 
     /**
@@ -74,5 +82,13 @@ class FieldSet
     public function getMixed($key = null)
     {
         return $this->lastReport()->getMixed($key);
+    }
+
+    /**
+     * @return Language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 }

@@ -8,7 +8,7 @@ use validity\Report;
 
 class Enum extends Field
 {
-    protected function __construct($name, array $values, $message)
+    protected function __construct($name, array $values, $message = null)
     {
         parent::__construct($name, self::ANY, null);
         $this->addRule(

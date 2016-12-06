@@ -64,7 +64,12 @@ class Report
 
     public function getRaw($key = null)
     {
-        return (null === $key) ? $this->raw : (isset($this->raw[$key]) ? $this->raw[$key] : null);
+        return (null === $key) ? $this->raw : ($this->inputKeyExists($key) ? $this->raw[$key] : null);
+    }
+
+    public function inputKeyExists($key)
+    {
+        return array_key_exists($key, $this->raw);
     }
 
     /**

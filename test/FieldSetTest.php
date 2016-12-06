@@ -45,10 +45,11 @@ class StubFieldPass extends Field
     {
         parent::__construct(self::NAME, self::STRING, null);
     }
-    public function isValid(Report $Report): bool
+    public function isValid($value): bool
     {
-        $Report->setFiltered(self::NAME, $Report->getRaw(self::NAME));
-        return false;
+        $this->currentValue = $value;
+        $this->updateFilteredValue();
+        return true;
     }
 }
 
@@ -60,9 +61,9 @@ class StubFieldFail extends Field
     {
         parent::__construct(self::NAME, self::STRING, null);
     }
-    public function isValid(Report $Report): bool
+    public function isValid($value): bool
     {
-        $Report->addError($this->getName(), self::ERROR_MESSAGE);
-        return true;
+        $this->addError(self::ERROR_MESSAGE);
+        return false;
     }
 }

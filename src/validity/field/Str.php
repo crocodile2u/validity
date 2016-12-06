@@ -18,7 +18,9 @@ class Str extends Field
      */
     protected function castToType($value)
     {
-        if (!is_string($value)) {
+        if (is_scalar($value)) {
+            $value = (string) $value;
+        } else {
             return null;
         }
         $filteredValue = mb_convert_encoding($value, 'utf-8', 'utf-8');
