@@ -12,6 +12,7 @@ use validity\field\Enum;
 use validity\field\Integer;
 use validity\field\Phone;
 use validity\field\Str;
+use validity\field\Url;
 
 class Field
 {
@@ -171,6 +172,17 @@ class Field
     public static function phone(string $name, int $minLength = 7, $message = null): Str
     {
          return new Phone($name, $minLength, $message);
+    }
+
+    /**
+     * @param string $name
+     * @param int $minLength
+     * @param string $message
+     * @return Url
+     */
+    public static function url(string $name, $message = null): Url
+    {
+        return new Url($name, $message);
     }
 
     /**
