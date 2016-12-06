@@ -4,13 +4,19 @@ namespace validity\field;
 
 use validity\Field;
 use validity\FieldSet;
-use validity\Report;
 
 class Assoc extends Field
 {
+    /**
+     * Assoc constructor.
+     * @param $name
+     * @param FieldSet $innerFieldSet
+     * @param null $message
+     * @param string $errorSeparator
+     */
     protected function __construct($name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ")
     {
-        parent::__construct($name, self::ANY, null);
+        parent::__construct($name, null);
         $this->addRule(
             function($value, FieldSet $fieldSet) use ($innerFieldSet, $errorSeparator) {
                 if (!is_array($value)) {
@@ -27,5 +33,10 @@ class Assoc extends Field
             },
             $message
         );
+    }
+
+    protected function isArray()
+    {
+        return true;
     }
 }

@@ -9,10 +9,9 @@ The goal was simple: to have a reasonably small validation package that _easily_
 * validating basic data types, without having to type a lot,
 * validating arrays, validating against complex logic,
 * validating values depending on other fields' values,
-* easy filtering
-* easy internationalization, understandable error messages for all cases &mdash; out-of-the-box, with ability to specify custom message for each and every case
-
-
+* filtering of value
+* internationalization, nice error messages for all cases &mdash; out-of-the-box
+* ability to specify custom message for each and every case
 
 ## Features
 
@@ -20,7 +19,7 @@ The goal was simple: to have a reasonably small validation package that _easily_
 * More advanced types: date, datetime, email, phone, enum.
 * Pattern validation.
 * User-supplied callback validation.
-* Validation of array values (f. e. array of checkboxes or text inputs).
+* Validation of array values (f. e. array of checkboxes or text inputs). Precise error messages (ability to display the exact key on which the error happened). Messages are internally represented as objects containing array key information, if relevant. Every message is exported to JSON as {text: <string>, "key": <null or string or int>}
 * Validation of a compound field (field is an associative array).
 * Filtration with user-supplied callbacks.
 * Easy setting of limits (min/max) for numeric fields, date/datetime fields, setting min and max length for strings.

@@ -8,9 +8,14 @@ use validity\Report;
 
 class Str extends Field
 {
-    protected function __construct($name, $typeMessage)
+    /**
+     * Str constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message)
     {
-        parent::__construct($name, self::STRING, $typeMessage);
+        parent::__construct($name, $message);
     }
 
     /**

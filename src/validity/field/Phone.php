@@ -6,7 +6,13 @@ use validity\Language;
 
 class Phone extends Str
 {
-    protected function __construct($name, $minLength = 7, $message = null)
+    /**
+     * Phone constructor.
+     * @param string $name
+     * @param int $minLength
+     * @param string $message
+     */
+    protected function __construct(string $name, $minLength = 7, $message = null)
     {
         parent::__construct($name, $message);
         $this->addFilter(

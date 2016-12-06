@@ -4,20 +4,21 @@ namespace validity\field;
 
 use validity\Field;
 use validity\Language;
-use validity\Report;
 
 class Enum extends Field
 {
-    protected function __construct($name, array $values, $message = null)
+    /**
+     * Enum constructor.
+     * @param string $name
+     * @param array $values
+     * @param null $message
+     */
+    protected function __construct(string $name, array $values, $message = null)
     {
-        parent::__construct($name, self::ANY, null);
+        parent::__construct($name, null);
         $this->addRule(
             function($value) use ($values) {
-                if (in_array($value, $values)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return in_array($value, $values);
             },
             $message,
             Language::ENUM_VALIDATION_FAILED,

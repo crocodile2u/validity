@@ -4,15 +4,16 @@ namespace validity\field;
 
 use validity\Field;
 use validity\Language;
-use validity\Report;
 
 trait Range
 {
+    /**
+     * @var array
+     */
     private static $languageKeyMap = [
-        Field::INT => [Language::NUMBER_MIN, Language::NUMBER_MAX],
-        Field::FLOAT => [Language::NUMBER_MIN, Language::NUMBER_MAX],
-        Field::DATE => [Language::DATE_MIN, Language::DATE_MAX],
-        Field::DATETIME => [Language::DATE_MIN, Language::DATE_MAX],
+        Integer::class => [Language::NUMBER_MIN, Language::NUMBER_MAX],
+        Double::class => [Language::NUMBER_MIN, Language::NUMBER_MAX],
+        Timestamp::class => [Language::DATE_MIN, Language::DATE_MAX],
     ];
 
     /**
@@ -32,7 +33,7 @@ trait Range
                 }
             },
             $message,
-            self::$languageKeyMap[$this->getType()][0],
+            $this->resolveMessageKeys()[0],
             ["min" => $min]
         );
     }
@@ -53,9 +54,19 @@ trait Range
                 }
             },
             $message,
-            self::$languageKeyMap[$this->getType()][1],
+            $this->resolveMessageKeys()[1],
             ["max" => $max]
         );
+    }
+
+    private function resolveMessageKeys()
+    {
+        foreach (self::$languageKeyMap as $class => $keys) {
+            if ($this instanceof $class) {
+                return $keys;
+            }
+        }
+        return [Language::MIN, Language::MAX];
     }
 
     abstract protected function compareWith($value): int;

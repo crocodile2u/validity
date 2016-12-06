@@ -43,7 +43,7 @@ class StubFieldPass extends Field
     const NAME = 'pass';
     public function __construct()
     {
-        parent::__construct(self::NAME, self::STRING, null);
+        parent::__construct(self::NAME, null);
     }
     public function isValid($value): bool
     {
@@ -59,7 +59,7 @@ class StubFieldFail extends Field
     const ERROR_MESSAGE = 'failed';
     public function __construct()
     {
-        parent::__construct(self::NAME, self::STRING, null);
+        parent::__construct(self::NAME, null);
     }
     public function isValid($value): bool
     {

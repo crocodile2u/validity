@@ -21,21 +21,34 @@ abstract class Timestamp extends Str
      */
     protected $datetimeValue;
 
-    protected function __construct($name, $typeMessage, $refinedType)
+    /**
+     * Timestamp constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message)
     {
-        parent::__construct($name, $typeMessage);
-        $this->setType($refinedType);
+        parent::__construct($name, $message);
         $this->outputFormat = static::DEFAULT_OUTPUT_FORMAT;
         $this->inputFormat = static::DEFAULT_INPUT_FORMAT;
     }
 
-    public function setOutputFormat($outputFormat)
+    /**
+     * @param string $outputFormat
+     * @return $this
+     */
+    public function setOutputFormat(string $outputFormat)
     {
         $this->outputFormat = $outputFormat;
         return $this;
     }
 
-    public function setInputFormat($inputFormat, $strict = true)
+    /**
+     * @param string $inputFormat
+     * @param bool $strict
+     * @return $this
+     */
+    public function setInputFormat(string $inputFormat, bool $strict = true)
     {
         $this->inputFormat = $inputFormat;
         $this->inputFormatStrict = $strict;
@@ -52,6 +65,10 @@ abstract class Timestamp extends Str
         return $this;
     }
 
+    /**
+     * @param mixed $value
+     * @return string
+     */
     protected function castToType($value)
     {
         $value = parent::castToType($value);
@@ -75,6 +92,11 @@ abstract class Timestamp extends Str
         }
     }
 
+    /**
+     * @param mixed $spec
+     * @return false|int|null
+     * @throws \InvalidArgumentException
+     */
     protected function toTimestamp($spec)
     {
         if (null === $spec) {
@@ -87,7 +109,7 @@ abstract class Timestamp extends Str
             if ($ts = strtotime($spec)) {
                 return $ts;
             } else {
-                throw new \InvalidArgumentException("Cannot convert {$this->getName()} to timestamp");
+                throw new \InvalidArgumentException("Cannot convert value to timestamp: " . var_export($spec, 1));
             }
         }
     }

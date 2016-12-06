@@ -6,11 +6,20 @@ use validity\Field;
 
 class Boolean extends Field
 {
-    protected function __construct($name, $typeMessage)
+    /**
+     * Boolean constructor.
+     * @param string $name
+     * @param $message
+     */
+    protected function __construct(string $name, $message = null)
     {
-        parent::__construct($name, self::BOOLEAN, $typeMessage);
+        parent::__construct($name, $message);
     }
 
+    /**
+     * @param mixed $value
+     * @return bool|null
+     */
     protected function castToType($value)
     {
         if (is_bool($value)) {

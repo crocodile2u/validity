@@ -9,9 +9,14 @@ class Date extends Timestamp
     const DEFAULT_OUTPUT_FORMAT = "Y-m-d";
     const DEFAULT_INPUT_FORMAT = "d.m.Y";
 
-    protected function __construct($name, $typeMessage)
+    /**
+     * Date constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message = null)
     {
-        parent::__construct($name, $typeMessage, self::DATE);
+        parent::__construct($name, $message);
     }
 
     /**

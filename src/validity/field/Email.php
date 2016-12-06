@@ -6,7 +6,12 @@ use validity\Language;
 
 class Email extends Str
 {
-    protected function __construct($name, $message = null)
+    /**
+     * Email constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message = null)
     {
         parent::__construct($name, $message);
         $this->addRegexpRule(

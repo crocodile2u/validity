@@ -8,9 +8,14 @@ class Double extends Field
 {
     use Range;
 
-    protected function __construct($name, $typeMessage)
+    /**
+     * Double constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message = null)
     {
-        parent::__construct($name, self::FLOAT, $typeMessage);
+        parent::__construct($name, $message);
     }
 
     /**

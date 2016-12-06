@@ -31,5 +31,7 @@ class Ru extends Language
         self::DATE_MAX => "Поле {label} не должно быть позднее {max}",
         self::ARRAY_MIN_LEN => "Поле {label} должно содержать как минимум {min} элементов",
         self::ARRAY_MAX_LEN => "Поле {label} должно содержать максимум {max} элементов",
+        self::MIN => "Минимальное значение поля {label} - {min}",
+        self::MIN => "Максимальное значение поля {label} - {max}",
     ];
 }

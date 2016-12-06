@@ -8,9 +8,14 @@ class Integer extends Field implements RangeAware
 {
     use Range;
 
-    protected function __construct($name, $typeMessage)
+    /**
+     * Integer constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message = null)
     {
-        parent::__construct($name, self::INT, $typeMessage);
+        parent::__construct($name, $message);
     }
 
     /**

@@ -31,5 +31,7 @@ class En extends Language
         self::DATE_MAX => "{label} must not be later than {max}",
         self::ARRAY_MIN_LEN => "{label} must have at least {min} elements",
         self::ARRAY_MAX_LEN => "{label} must have at most {max} elements",
+        self::MIN => "{label} must have a minimum value of {min}",
+        self::MIN => "{label} must have a minimum value of {min}",
     ];
 }

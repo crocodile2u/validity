@@ -29,7 +29,9 @@ abstract class Language
         DATE_MIN = 21,
         DATE_MAX = 22,
         ARRAY_MIN_LEN = 23,
-        ARRAY_MAX_LEN = 24;
+        ARRAY_MAX_LEN = 24,
+        MIN = 25,
+        MAX = 26;
 
     /**
      * @var string[]

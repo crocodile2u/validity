@@ -2,6 +2,7 @@
 
 namespace validity;
 
+use validity\field\Any;
 use validity\field\Assoc;
 use validity\field\Boolean;
 use validity\field\Date;
@@ -31,7 +32,6 @@ class Field
      */
     private $ownerFieldSet;
 
-    private $type = self::ANY;
     private $required = false;
     private $requiredMessage;
     private $requiredCallback;
@@ -52,30 +52,7 @@ class Field
     private $defaultReplaceEmpty = false;
     private $defaultReplaceInvalid = false;
 
-    const INT = 0;
-    const FLOAT = 1;
-    const STRING = 2;
-    const BOOLEAN = 3;
-    const CALLBACK = 4;
-    const ENUM = 5;
-    const ASSOC = 6;
-    const ANY = 7;
-    const MIN = 8;
-    const MAX = 9;
-    const MIN_LENGTH = 10;
-    const MAX_LENGTH = 11;
-    const DATE = 12;
-    const DATETIME = 13;
-
     private $rules = array();
-
-    private static $arrays = array(
-        self::ASSOC,
-    );
-
-    private static $allowArrays = array(
-        self::ANY,
-    );
 
     /** @var Report */
     private $report;
@@ -210,11 +187,11 @@ class Field
 
     /**
      * @param $name string
-     * @return Field
+     * @return Any
      */
-    public static function any($name): Field
+    public static function any($name): Any
     {
-        return new self($name, self::ANY, null);
+        return new Any($name);
     }
 
     /**
@@ -223,10 +200,9 @@ class Field
      * @param $type
      * @param $message
      */
-    protected function __construct($name, $type, $message)
+    protected function __construct($name, $message)
     {
         $this->name = $name;
-        $this->type = $type;
         $this->addRule(
             function($value, FieldSet $fieldSet) {
                 $value = $this->castToType($value);
@@ -329,14 +305,6 @@ class Field
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @return int
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -570,17 +538,27 @@ class Field
             }
 
             return true;
-        } elseif (in_array($this->type, self::$arrays)) {
+        } elseif ($this->isArray()) {
             if (!is_array($this->currentValue)) {// value MUST BE an array
                 $this->addError($this->getArrayMessage());
                 return false;
             }
-        } elseif (!in_array($this->type, self::$allowArrays) && !is_scalar($this->currentValue)) {// value MUST BE a scalar
+        } elseif (!$this->allowsArray() && !is_scalar($this->currentValue)) {// value MUST BE a scalar
             $this->addError($this->predefinedMessage(Language::SCALAR_EXPECTED));
             return false;
         }
 
         return true;
+    }
+
+    protected function allowsArray()
+    {
+        return false;
+    }
+
+    protected function isArray()
+    {
+        return false;
     }
 
     /**
@@ -648,11 +626,22 @@ class Field
         }
     }
 
+    /**
+     * @param string $value
+     * @return mixed
+     */
     protected function preFilterStringValue($value)
     {
         return $value;
     }
 
+    /**
+     * @param callable $callback
+     * @param string $message
+     * @param int $messageKey
+     * @param array $messageData
+     * @return bool
+     */
     private function checkSingleRule(callable $callback, $message, $messageKey, $messageData)
     {
         $report = $this->getReport();
@@ -676,6 +665,15 @@ class Field
         return $report->isOk($this->name);
     }
 
+    /**
+     * @param mixed $value
+     * @param callable $callback
+     * @param string $message
+     * @param int $messageKey
+     * @param array $messageData
+     * @param null|string|int $key
+     * @return mixed|null
+     */
     private function checkCallback($value, $callback, $message, $messageKey, $messageData, $key = null)
     {
         $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
@@ -692,6 +690,9 @@ class Field
         }
     }
 
+    /**
+     * @return string
+     */
     private function getArrayMessage()
     {
         $data = ["min" => $this->arrayMinLength, "max" => $this->arrayMaxLength];
@@ -700,12 +701,18 @@ class Field
             : $this->predefinedMessage(Language::ARRAY_EXPECTED);
     }
 
+    /**
+     * @return bool
+     */
     protected function updateFilteredValue()
     {
         $this->getReport()->setFiltered($this->name, $this->currentValue);
         return true;
     }
 
+    /**
+     * @return bool
+     */
     private function applyFilters()
     {
         if ($this->valueEmpty) {
@@ -723,6 +730,10 @@ class Field
         return true;
     }
 
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
     private function applyFiltersToValue($value)
     {
         $ret = $value;
@@ -732,6 +743,12 @@ class Field
         return $ret;
     }
 
+    /**
+     * @param string $template
+     * @param int $key
+     * @param array $data
+     * @return string
+     */
     protected function smartMessage($template, $key, array $data = [])
     {
         return $template
@@ -739,24 +756,24 @@ class Field
             : $this->predefinedMessage($key, $data);
     }
 
+    /**
+     * @param string $template
+     * @param array $data
+     * @return mixed
+     */
     protected function arbitraryMessage($template, array $data = [])
     {
         return $this->getLanguage()->message($template, $data + ["label" => $this->getLabel()]);
     }
 
+    /**
+     * @param int G$key
+     * @param array $data
+     * @return mixed
+     */
     protected function predefinedMessage($key, array $data = [])
     {
         return $this->getLanguage()->translate($key, $data + ["label" => $this->getLabel()]);
-    }
-
-    /**
-     * @param int $type
-     * @return $this
-     */
-    protected function setType($type)
-    {
-        $this->type = $type;
-        return $this;
     }
 
     /**

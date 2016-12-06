@@ -9,9 +9,14 @@ class Datetime extends Timestamp
     const DEFAULT_OUTPUT_FORMAT = "Y-m-d H:i:s";
     const DEFAULT_INPUT_FORMAT = self::DEFAULT_OUTPUT_FORMAT;
 
-    protected function __construct($name, $typeMessage)
+    /**
+     * Datetime constructor.
+     * @param string $name
+     * @param string $message
+     */
+    protected function __construct(string $name, $message = null)
     {
-        parent::__construct($name, $typeMessage, self::DATETIME);
+        parent::__construct($name, $message);
     }
 
     /**
