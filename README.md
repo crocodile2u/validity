@@ -44,8 +44,8 @@ $fieldSet = (new FieldSet())
             Field::int("subscriptions")->setMin(1)->expectArray()
         )->add(
             Field::email("email")->setRequiredIf(
-                function(\validity\Report $report) {
-                    return (bool) $report->getFiltered("subscriptions");
+                function(FieldSet $fieldSet) {
+                    return (bool) $fieldSet->getFiltered("subscriptions");
                 }
             )
         )->add(
@@ -103,8 +103,8 @@ Sometimes, a field is only required in case some other fields are filled (or any
 
 ```php
 Field::email("email")->setRequiredIf(
-    function(\validity\Report $report) {
-        return (bool) $report->getFiltered("subscriptions");
+    function(FieldSet $fieldSet) {
+        return (bool) $fieldSet->getFiltered("subscriptions");
     }
 );
 ```
@@ -157,15 +157,19 @@ This is the most powerful validation:
 ```php
 Field::string("username")
     ->addCallbackRule(
-        function($name, $value, $message, \validity\Report $Report) {
-            if (Users::usernameExists($value)) {
-                $Report->addError($name, "User already exists");
-            } else {
-                return $value;
-            }
+        function($value, FieldSet $fieldSet) {
+            return !Users::usernameExists($value);
         }
     );
 ```
+
+When the callback is called, it is passed 3 arguments:
+
+1. $value &mdash; obviously, the value to be validated;
+1. $fieldSet &mdash; the FieldSet instance, so that it's possible to get values of neighboring fields;
+1. $key &mdash; in case the field expects an [array value](#validating-arrays), then an integer or a string key of the array element is passed (defaults to NULL).
+
+The callback should return boolean: TRUE if the validation passes, FALSE if it fails.
 
 ## Dates
 
@@ -174,3 +178,43 @@ Date and datetime fields will transform the input value to a formatted date, so 
 ## Labels
 
 Every field must have a name. Name is the first and required parameter to all the [named constructors](#creating-fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
+
+## Validating arrays
+
+Any field can be set to expect an array value:
+
+```php
+Field::int("subscriptions")->expectArray();
+```
+
+In this case, the field is expected to be array of elements, each of those validated against type (_int_ in the example above) and any of the rules that you specify. Minimum and maximum array length can be controlled with:
+
+* setArrayMinLength(int)
+* setArrayMaxLength(int)
+
+In case some of the array elements fail validation, it might be handy to see what particular elements failed. Consider the following example: 
+
+```php
+Field::int("subscriptions", "{label}: value #{key} is not an integer")
+    ->setMin(1, "Subscriptions: value #{key} must be greater then or equal to {min}")
+    ->expectArray();
+```
+
+Let's say we have the following dataset:
+
+```json
+{
+  "subscriptions": [
+    1,
+    "not an integer",
+    -1
+  ]
+}
+```
+
+Then we will have the following error messages:
+
+* subscriptions: value #2 is not an integer"
+* subscriptions: value #3 must be greater then or equal to {min}"
+
+The message parser will replace "{key}" with the corresponding array key. For numeric arrays, key will be incremented by one, because it's more human-readable.
