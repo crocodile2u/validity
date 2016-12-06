@@ -34,9 +34,9 @@ class Report
         return !$this->isOk($key);
     }
 
-    public function addError($field, $message)
+    public function addError($field, $message, $key = null)
     {
-        $this->errorSet->add($field, $message);
+        $this->errorSet->add($field, $message, $key);
         return null;
     }
 

@@ -529,7 +529,7 @@ class Field
     private function isRequiredByCondition()
     {
         return $this->requiredCallback
-            ? (bool) call_user_func_array($this->requiredCallback, array($this->getReport()))
+            ? (bool) call_user_func_array($this->requiredCallback, array($this->getOwnerFieldSet()))
             : true;
     }
 
@@ -680,13 +680,16 @@ class Field
     {
         $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
         $messageData = $messageData ?: [];
+        if (null !== $key) {
+            $messageData["key"] = is_int($key) ? ($key + 1) : $key;
+        }
         $message = $this->smartMessage($message, $messageKey, $messageData);
         $report = $this->getReport();
         $result = call_user_func_array($callback, [$value, $report, $key]);
         if ($result) {
             return $report->getFiltered($this->name);
         } else {
-            return $report->addError($this->name, $message);
+            return $report->addError($this->name, $message, $key);
         }
     }
 

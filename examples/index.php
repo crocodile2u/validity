@@ -17,19 +17,19 @@ if ($sent) {
         )->add(
             Field::enum("greeting", ["mr", "mrs"])->setRequired()
         )->add(
-            Field::int("subscriptions")->setMin(1)->expectArray()
+            Field::int("subscriptions", "Invalid subscription selected ({key})")->setMin(1)->expectArray()
         )->add(
             Field::email("email")->setRequiredIf(
-                function(\validity\Report $report) {
-                    return (bool) $report->getFiltered("subscriptions");
+                function(FieldSet $fieldSet) {
+                    return (bool) $fieldSet->getFiltered("subscriptions");
                 }
             )
         )->add(
             Field::date("date_of_birth")->setMax("-18years")->setRequired()
         )->add(
             Field::string("education")
-                ->setMinLength(10)
-                ->setMaxLength(100)
+                ->setMinLength(10, "{label} ({key}) is expected to have a minimum length of {min} characters")
+                ->setMaxLength(100, "{label} ({key}) is expected to have a maximum length of {max} characters")
                 ->expectArray()
                 ->setArrayMinLength(0)
                 ->setArrayMaxLength(3)

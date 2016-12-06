@@ -47,7 +47,7 @@ class FieldSet
             $name = $field->getName();
             if ($this->lastReport->inputKeyExists($name)) {
                 $value = $this->lastReport->getRaw($field->getName());
-                $ret = ($ret && $field->isValid($value));
+                $ret = $field->isValid($value) && $ret;
             } else {
                 $ret = $field->checkRequired(null) && $ret;
             }
@@ -81,7 +81,7 @@ class FieldSet
      */
     public function getMixed($key = null)
     {
-        return $this->lastReport()->getMixed($key);
+        return $this->lastReport->getMixed($key);
     }
 
     /**

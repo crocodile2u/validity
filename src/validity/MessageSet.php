@@ -4,16 +4,9 @@ namespace validity;
 
 class MessageSet extends \ArrayObject
 {
-    function add($field, $message)
+    function add($field, $message, $key = null)
     {
-        if (empty($this[$field])) {
-            $this[$field] = [];
-        }
-        if (is_array($message)) {
-            $this[$field] = array_merge($this[$field], $message);
-        } else {
-            $this[$field][] = $message;
-        }
+        $this[$field][] = new Message($message, $key);
         return null;
     }
     function reset($field)
