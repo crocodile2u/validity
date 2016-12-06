@@ -228,12 +228,12 @@ class Field
         $this->name = $name;
         $this->type = $type;
         $this->addRule(
-            function($value, Report $report) {
+            function($value, FieldSet $fieldSet) {
                 $value = $this->castToType($value);
                 if (null === $value) {
                     return false;
                 } else {
-                    $report->setFiltered($this->getName(), $value);
+                    $fieldSet->getLastReport()->setFiltered($this->getName(), $value);
                     return true;
                 }
             },
@@ -684,12 +684,11 @@ class Field
             $messageData["key"] = is_int($key) ? ($key + 1) : $key;
         }
         $message = $this->smartMessage($message, $messageKey, $messageData);
-        $report = $this->getReport();
-        $result = call_user_func_array($callback, [$value, $report, $key]);
+        $result = call_user_func_array($callback, [$value, $this->getOwnerFieldSet(), $key]);
         if ($result) {
-            return $report->getFiltered($this->name);
+            return $this->getOwnerFieldSet()->getFiltered($this->name);
         } else {
-            return $report->addError($this->name, $message, $key);
+            return $this->getReport()->addError($this->name, $message, $key);
         }
     }
 

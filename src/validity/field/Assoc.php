@@ -12,17 +12,17 @@ class Assoc extends Field
     {
         parent::__construct($name, self::ANY, null);
         $this->addRule(
-            function($value, Report $Report) use ($innerFieldSet, $errorSeparator) {
+            function($value, FieldSet $fieldSet) use ($innerFieldSet, $errorSeparator) {
                 if (!is_array($value)) {
                     return false;
                 }
 
                 if ($innerFieldSet->isValid($value)) {
-                    $Report->setFiltered($this->getName(), $value);
+                    $fieldSet->getLastReport()->setFiltered($this->getName(), $value);
                     return true;
                 } else {
-                    $errors = join($errorSeparator, $innerFieldSet->getErrors()->toPlainArray($errorSeparator));
-                    return $Report->addError($this->getName(), $errors);
+                    $errorStr = join($errorSeparator, $innerFieldSet->getErrors()->toPlainArray($errorSeparator));
+                    return $fieldSet->getLastReport()->addError($this->getName(), $errorStr);
                 }
             },
             $message
