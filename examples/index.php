@@ -61,6 +61,7 @@ $valid = $fieldSet->isValid($_GET);
     <?php include __DIR__ . "/menu.html"; ?>
     <div class="starter-template">
         <h1>Validity example</h1>
+        <p>This example has a form with various field types. Some of them are specifically designed so that it would be easy to make an error. Play around and see what happens.</p>
         <div class="row">
             <div class="col-sm-6">
                 <form class="form" method="get">
@@ -194,7 +195,7 @@ $valid = $fieldSet->isValid($_GET);
 </pre>
             </div>
             <div class="col-sm-6">
-                <?php include __DIR__ . "errors.php"; ?>
+                <?php include __DIR__ . "/errors.php"; ?>
             </div>
         </div>
     </div>

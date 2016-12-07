@@ -42,6 +42,7 @@ if ($sent) {
     <?php include __DIR__ . "/menu.html"; ?>
     <div class="starter-template">
         <h1>Validity example: price range</h1>
+        <p>Both price fields are validated as integers, minimum 0, maximum 1000. Max price has also a callback rule to check that maximum value is not lower than the minimum.</p>
         <div class="row">
             <div class="col-sm-8">
                 <form class="form form-inline" method="get">

@@ -64,6 +64,7 @@ if ($sent) {
         <h1>Validity example: compound input</h1>
         <div class="row">
             <div class="col-sm-8">
+                <p>In this example, date can be set with two dropdowns (<i>day</i> and <i>month</i>) and a text input (<i>year</i>). The inputs are named <i>date[day]</i>, <i>date[month]</i>, <i>date[year]</i>, so in PHP's <i>$_GET</i> superglobal the <i>date</i> key contains an array or 3 elements: <i>day</i>, <i>month</i> and year, all being numeric strings. In the main field-set, date field is built as an <b>Assoc</b> field which uses another field-set to validate its elements.</p>
                 <form class="form form-inline" method="get">
                     <div class="form-group">
                         <label class="control-label required">Date</label>
