@@ -225,7 +225,7 @@ Assoc (_Field::**assoc**()_) is a compound field, so _FieldSet_ will expect the 
 
 ## Tips &amp; tricks
 
-* Are you using [Zend Framework](http://zendframework.com/) but still want to use validity? Good new for you! Zend Validators are callable, so you can simply add them as validation rules:
+* Are you using [Zend Framework](http://zendframework.com/) but still want to use validity? Good news for you! Zend Validators are callable, so you can simply add them as validation rules:
 
 ```php
 Field::string("email")->addCallbakRule(new EmailAddress(), "Email is invalid!");
