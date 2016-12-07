@@ -223,6 +223,24 @@ The message parser will replace "{key}" with the corresponding array key. For nu
 
 Assoc (_Field::**assoc**()_) is a compound field, so _FieldSet_ will expect the value to be an array, which it will validate with a help of _$innerFieldSet_. A real-life example: set of three fields used to make up a date input: _date\[year\]_, _date\[month\]_, _date\[day\]_. Let's suppose that we expect \$_POST\[\"date\"\] to be array(year: integer, month: integer, day: integer) In this case, _$innerFieldSet_ will contain fields, created with _Field::int()_ and named _year_, _month_ and _day_, each having proper range validation: _setMax()_ and _setMin()_. _$message_ parameter to Field::**assoc**() will only be used in case when \$_POST\[\"date\"\] is not an array. If it is an array, then the _$innerFieldSet_ will take care of further validation. Should the _$innerFieldSet_ report any errors, they will all be combined into a string and used as an error message for the _date_ field in the outer _FieldSet_.
 
+## Tips &amp; tricks
+
+* Are you using [Zend Framework](http://zendframework.com/) but still want to use validity? Good new for you! Zend Validators are callable, so you can simply add them as validation rules:
+
+```php
+Field::string("email")->addCallbakRule(new EmailAddress(), "Email is invalid!");
+```
+
+* Are you using [Yii2](http://www.yiiframework.com/) but still want to use validity? It's just a tiny bit more complicated thenin case of ZF:
+
+```php
+Field::string("email")->addCallbakRule(function($value) {
+    return (new EmailValidator())->validate($value);
+}, "Email is invalid!");
+```
+
+I chose email validation for this tips on  purpose. Validity also offers email validation, but (at least for now) it is a simple regexp check. Zend or Yii2 offer much more sophisticated ways to validate an email, and you can simply use it while at the same time performing routines validity-style.
+
 ## Labels
 
 Every field must have a name. Name is the first and required parameter to all the [named constructors](#creating-fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
