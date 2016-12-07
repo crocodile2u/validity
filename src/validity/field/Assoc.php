@@ -7,6 +7,7 @@ use validity\FieldSet;
 
 class Assoc extends Field
 {
+    protected $suppressError = true;
     /**
      * Assoc constructor.
      * @param $name

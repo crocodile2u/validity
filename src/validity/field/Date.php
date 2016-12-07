@@ -7,7 +7,7 @@ class Date extends Timestamp
     use Range;
 
     const DEFAULT_OUTPUT_FORMAT = "Y-m-d";
-    const DEFAULT_INPUT_FORMAT = "d.m.Y";
+    const DEFAULT_INPUT_FORMAT = "Y-m-d";
 
     /**
      * Date constructor.

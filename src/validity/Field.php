@@ -43,6 +43,7 @@ class Field
     private $arrayMinMessage;
     private $arrayMaxMessage;
     private $arraySkipEmpty = true;
+    protected $suppressError = false;
     /**
      * @var Language|null
      */
@@ -676,17 +677,19 @@ class Field
      */
     private function checkCallback($value, $callback, $message, $messageKey, $messageData, $key = null)
     {
-        $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
-        $messageData = $messageData ?: [];
-        if (null !== $key) {
-            $messageData["key"] = is_int($key) ? ($key + 1) : $key;
-        }
-        $message = $this->smartMessage($message, $messageKey, $messageData);
         $result = call_user_func_array($callback, [$value, $this->getOwnerFieldSet(), $key]);
         if ($result) {
             return $this->getOwnerFieldSet()->getFiltered($this->name);
-        } else {
+        } elseif (!$this->suppressError) {
+            $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
+            $messageData = $messageData ?: [];
+            if (null !== $key) {
+                $messageData["key"] = is_int($key) ? ($key + 1) : $key;
+            }
+            $message = $this->smartMessage($message, $messageKey, $messageData);
             return $this->getReport()->addError($this->name, $message, $key);
+        } else {
+            return null;
         }
     }
 
