@@ -28,6 +28,10 @@ The goal was simple: to have a reasonably small validation package that _easily_
 * Easy to override error messages for each and every validation rule: if you don't specify an error message, then a default one is selected from the language class. If a message is provided for a rule, that message is used.
 * When dealing with strings, potentially malicious unicode characters are not allowed, for better security.
 
+## Examples
+
+A few examples can be found in the _examples_ folder. The easiest way to see them is to let your web-server serve these scripts: I simply symlink the examples folder below my localhost's _$root_.
+
 ## Code example
 
 ```php
