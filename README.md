@@ -32,37 +32,36 @@ The goal was simple: to have a reasonably small validation package that _easily_
 
 A few examples can be found in the _examples_ folder. The easiest way to see them is to let your web-server serve these scripts: I simply symlink the examples folder below my localhost's _$root_.
 
-## Code example
+I will also provide an example right here:
 
 ```php
 
 use \validity\FieldSet, \validity\Field;
 
+$name = Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/")->setRequired();
+$greeting = Field::enum("greeting", ["mr", "mrs"])->setRequired();
+$subscriptions = Field::int("subscriptions")->setMin(1)->expectArray();
+$email = Field::email("email")->setRequiredIf(
+    function(FieldSet $fieldSet) {
+        return (bool) $fieldSet->getFiltered("subscriptions");
+    }
+);
+$dateOfBirth = Field::date("date_of_birth")->setMax("-18years")->setRequired();
+$education = Field::string("education")
+     ->setMinLength(10)
+     ->setMaxLength(100)
+     ->expectArray()
+     ->setArrayMinLength(0)
+     ->setArrayMaxLength(3)
+     ->setArraySkipEmpty(true);
+
 $fieldSet = (new FieldSet())
-        ->add(
-            Field::pattern("name", "/^[A-Z][a-zA-Z\- ]+$/")
-                ->setRequired()
-        )->add(
-            Field::enum("greeting", ["mr", "mrs"])->setRequired()
-        )->add(
-            Field::int("subscriptions")->setMin(1)->expectArray()
-        )->add(
-            Field::email("email")->setRequiredIf(
-                function(FieldSet $fieldSet) {
-                    return (bool) $fieldSet->getFiltered("subscriptions");
-                }
-            )
-        )->add(
-            Field::date("date_of_birth")->setMax("-18years")->setRequired()
-        )->add(
-            Field::string("education")
-                ->setMinLength(10)
-                ->setMaxLength(100)
-                ->expectArray()
-                ->setArrayMinLength(0)
-                ->setArrayMaxLength(3)
-                ->setArraySkipEmpty(true)
-        );
+        ->add($name)
+        ->add($greeting)
+        ->add($subscriptions)
+        ->add($email)
+        ->add($dateOfBirth)
+        ->add($education);
 
 if ($fieldSet->isValid($_POST)) {
     $data = $fieldSet->getFiltered();
@@ -219,7 +218,7 @@ Then we will have the following error messages:
 * subscriptions: value #3 must be greater then or equal to {min}"
 
 The message parser will replace "{key}" with the corresponding array key. Numeric arrays in PHP are zero-indexed, so by default, in case of an error on the first array element, you get an error message saying "value #0 is invalid". While this might be a desired behavior, you also might want this to be displayed as "value #1 is invalid". This is achieved by calling
-_Field::setArrayKeyOffset(1)_ - then all the keys are incremented by 1 in the error messages. It is also often the case that integer IDs are used as keys for various data, so by default _validity_ does not apply an offset to numeric keys. 
+_Field::setArrayKeyOffset(1)_ - then all the keys are incremented by 1 in the error messages. It is also often the case that integer IDs are used as keys for various data, so by default _validity_ does not apply an offset to numeric keys.
 
 ## Validating compound values
 
@@ -233,7 +232,7 @@ Assoc (_Field::**assoc**()_) is a compound field, so _FieldSet_ will expect the 
 Field::string("email")->addCallbakRule(new EmailAddress(), "Email is invalid!");
 ```
 
-* Are you using [Yii2](http://www.yiiframework.com/) but still want to use validity? It's just a tiny bit more complicated thenin case of ZF:
+* Are you using [Yii2](http://www.yiiframework.com/) but still want to use validity? It's just a tiny bit more complicated then in case of ZF:
 
 ```php
 Field::string("email")->addCallbakRule(function($value) {
