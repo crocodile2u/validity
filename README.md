@@ -197,7 +197,8 @@ In case some of the array elements fail validation, it might be handy to see wha
 ```php
 Field::int("subscriptions", "{label}: value #{key} is not an integer")
     ->setMin(1, "Subscriptions: value #{key} must be greater then or equal to {min}")
-    ->expectArray();
+    ->expectArray()
+    ->setArrayKeyOffset(1);
 ```
 
 Let's say we have the following dataset:
@@ -217,7 +218,8 @@ Then we will have the following error messages:
 * subscriptions: value #2 is not an integer"
 * subscriptions: value #3 must be greater then or equal to {min}"
 
-The message parser will replace "{key}" with the corresponding array key. For numeric arrays, key will be incremented by one, because it's more human-readable.
+The message parser will replace "{key}" with the corresponding array key. Numeric arrays in PHP are zero-indexed, so by default, in case of an error on the first array element, you get an error message saying "value #0 is invalid". While this might be a desired behavior, you also might want this to be displayed as "value #1 is invalid". This is achieved by calling
+_Field::setArrayKeyOffset(1)_ - then all the keys are incremented by 1 in the error messages. It is also often the case that integer IDs are used as keys for various data, so by default _validity_ does not apply an offset to numeric keys. 
 
 ## Validating compound values
 

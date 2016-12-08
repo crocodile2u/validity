@@ -12,10 +12,9 @@ class Assoc extends Field
      * Assoc constructor.
      * @param $name
      * @param FieldSet $innerFieldSet
-     * @param null $message
      * @param string $errorSeparator
      */
-    protected function __construct($name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ")
+    protected function __construct($name, FieldSet $innerFieldSet, $errorSeparator = "; ")
     {
         parent::__construct($name, null);
         $this->addRule(
@@ -32,7 +31,7 @@ class Assoc extends Field
                     return $fieldSet->getLastReport()->addError($this->getName(), $errorStr);
                 }
             },
-            $message
+            null
         );
     }
 

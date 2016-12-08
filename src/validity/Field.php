@@ -42,6 +42,7 @@ class Field
     private $arrayMaxLength = null;
     private $arrayMinMessage;
     private $arrayMaxMessage;
+    private $arrayKeyOffset = 0;
     private $arraySkipEmpty = true;
     protected $suppressError = false;
     /**
@@ -433,6 +434,15 @@ class Field
     }
 
     /**
+     * @param int $offset
+     */
+    public function setArrayKeyOffset(int $offset)
+    {
+        $this->arrayKeyOffset = $offset;
+        return $this;
+    }
+
+    /**
      * @param array $spec
      * @return $this
      */
@@ -684,7 +694,7 @@ class Field
             $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
             $messageData = $messageData ?: [];
             if (null !== $key) {
-                $messageData["key"] = is_int($key) ? ($key + 1) : $key;
+                $messageData["key"] = is_int($key) ? ($key + $this->arrayKeyOffset) : $key;
             }
             $message = $this->smartMessage($message, $messageKey, $messageData);
             return $this->getReport()->addError($this->name, $message, $key);
