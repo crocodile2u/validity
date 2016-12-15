@@ -33,10 +33,12 @@ class DoubleTest extends NumberTest
     function provider_testRangeValidation()
     {
         return [
-            [100, 200, '100', true, 100, "valid float fails validation"],
-            [100, 200, '200', true, 200, "valid float fails validation"],
-            [100, 200, '150', true, 150, "valid float fails validation"],
-            [100, 200, '1500', false, null, "out-of-bounds float value passes validation"],
+            [100, 200, true, '100', true, 100, "valid float fails validation"],
+            [100, 200, true, '200', true, 200, "valid float fails validation"],
+            [100, 200, true, '150', true, 150, "valid float fails validation"],
+            [100, 200, true, '1500', false, null, "out-of-bounds float value passes validation"],
+            [100, 200, false, '100.00', false, null, "out-of-bounds float (exclusive range) fails validation"],
+            [100, 200, false, '200,00', false, null, "out-of-bounds float (exclusive range) fails validation"],
         ];
     }
     protected function createField(): Field

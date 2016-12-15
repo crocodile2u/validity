@@ -27,17 +27,35 @@ class DateTest extends BaseFieldTest
         $this->assertInvalid("invalid date", Field::date("key"));
         $this->assertInvalid("2001-02-30", Field::date("key"));
     }
-    function testRangeValidation()
+
+    /**
+     * @param $inclusive
+     * @dataProvider provider_testRangeValidation
+     */
+    function testRangeValidation($inclusive)
     {
         $field = Field::date("key")
             ->setInputFormat("d.m.Y")
             ->setOutputFormat("Y-m-d")
-            ->setMin("2010-01-01")
-            ->setMax("2010-01-31");
-        $this->assertValid("01.01.2010", $field, "2010-01-01");
-        $this->assertValid("31.01.2010", $field, "2010-01-31");
+            ->setMin("2010-01-01", $inclusive)
+            ->setMax("2010-01-31", $inclusive);
+        if ($inclusive) {
+            $this->assertValid("01.01.2010", $field, "2010-01-01");
+            $this->assertValid("31.01.2010", $field, "2010-01-31");
+        } else {
+            $this->assertInvalid("01.01.2010", $field, null);
+            $this->assertInvalid("31.01.2010", $field, null);
+        }
         $this->assertValid("20.01.2010", $field, "2010-01-20");
         $this->assertInvalid("31.12.2009", $field);
         $this->assertInvalid("01.02.2010", $field);
+    }
+
+    function provider_testRangeValidation()
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 }

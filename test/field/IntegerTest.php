@@ -31,10 +31,12 @@ class IntegerTest extends NumberTest
     function provider_testRangeValidation()
     {
         return [
-            [100, 200, '100', true, 100, "valid integer fails validation"],
-            [100, 200, '200', true, 200, "valid integer fails validation"],
-            [100, 200, '150', true, 150, "valid integer fails validation"],
-            [100, 200, '1500', false, null, "out-of-bounds integer value passes validation"],
+            [100, 200, true, '100', true, 100, "valid integer fails validation"],
+            [100, 200, true, '200', true, 200, "valid integer fails validation"],
+            [100, 200, true, '150', true, 150, "valid integer fails validation"],
+            [100, 200, true, '1500', false, null, "out-of-bounds integer value passes validation"],
+            [100, 200, false, '100', false, null, "out-of-bounds integer (exclusive range) fails validation"],
+            [100, 200, false, '200', false, null, "out-of-bounds integer (exclusive range) fails validation"],
         ];
     }
     protected function createField(): Field

@@ -27,15 +27,16 @@ abstract class NumberTest extends BaseFieldTest
     /**
      * @param int|float $min
      * @param int|float $max
+     * @param bool $inclusive
      * @param mixed $value
      * @param bool $isValid
      * @param int $filtered
      * @param string $message
      * @dataProvider provider_testRangeValidation
      */
-    function testRangeValidation($min, $max, $value, $isValid, $filtered, $message)
+    function testRangeValidation($min, $max, $inclusive, $value, $isValid, $filtered, $message)
     {
-        $field = $this->createField()->setMin($min)->setMax($max);
+        $field = $this->createField()->setMin($min, $inclusive)->setMax($max, $inclusive);
         if ($isValid) {
             $this->assertValid($value, $field, $filtered, $message);
         } else {
