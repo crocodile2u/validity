@@ -76,7 +76,7 @@ abstract class Timestamp extends Str
             return null;
         }
         $datetime = \DateTime::createFromFormat($this->inputFormat, $value, $this->timezone);
-        if ($datetime) {
+        if ($datetime && (\DateTime::getLastErrors()['warning_count'] == 0)) {
             $this->datetimeValue = $datetime;
             return $datetime->format($this->outputFormat);
         } elseif ($this->inputFormatStrict) {
@@ -105,12 +105,10 @@ abstract class Timestamp extends Str
             return $spec;
         } elseif ($spec instanceof \DateTime) {
             return $spec->getTimestamp();
-        } elseif (is_string($spec)) {
-            if ($ts = strtotime($spec)) {
-                return $ts;
-            } else {
-                throw new \InvalidArgumentException("Cannot convert value to timestamp: " . var_export($spec, 1));
-            }
+        } elseif (is_string($spec) && ($ts = strtotime($spec))) {
+            return $ts;
+        } else {
+            throw new \InvalidArgumentException("Cannot convert value to timestamp: " . var_export($spec, 1));
         }
     }
 }

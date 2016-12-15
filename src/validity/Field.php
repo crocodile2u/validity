@@ -44,7 +44,6 @@ class Field
     private $arrayMaxMessage;
     private $arrayKeyOffset = 0;
     private $arraySkipEmpty = true;
-    protected $suppressError = false;
     /**
      * @var Language|null
      */
@@ -55,9 +54,6 @@ class Field
     private $defaultReplaceInvalid = false;
 
     private $rules = array();
-
-    /** @var Report */
-    private $report;
     protected $currentValue;
     private $valueEmpty = true;
 
@@ -446,12 +442,12 @@ class Field
      * @param array $spec
      * @return $this
      */
-    protected function addRule(callable $callback, $message = null, $messageKey = null, array $messageData = []): Field
+    protected function addRule(callable $callback, $message = null, $messageKey = null, array $messageData = [], $suppressError = false): Field
     {
         if (!is_callable($callback)) {
             throw new \InvalidArgumentException(__METHOD__ . " expects argument 1 to be a valid callback");
         }
-        $this->rules[] = [$callback, $message, $messageKey, $messageData];
+        $this->rules[] = [$callback, $message, $messageKey, $messageData, $suppressError];
         return $this;
     }
 
@@ -582,8 +578,8 @@ class Field
         }
 
         foreach ($this->rules as $spec) {
-            list($callback, $message, $messageKey, $messageData) = $spec;
-            $check = $this->checkSingleRule($callback, $message, $messageKey, $messageData);
+            list($callback, $message, $messageKey, $messageData, $suppressError) = $spec;
+            $check = $this->checkSingleRule($callback, $message, $messageKey, $messageData, $suppressError);
             if (!$check) {
                 return false;
             }
@@ -651,9 +647,10 @@ class Field
      * @param string $message
      * @param int $messageKey
      * @param array $messageData
+     * @param bool $suppressError
      * @return bool
      */
-    private function checkSingleRule(callable $callback, $message, $messageKey, $messageData)
+    private function checkSingleRule(callable $callback, $message, $messageKey, $messageData, $suppressError)
     {
         $report = $this->getReport();
         if ($this->expectArray) {
@@ -670,7 +667,14 @@ class Field
             $report->setFiltered($this->name, $validValues);
             return $ret;
         } else {
-            $this->currentValue = $this->checkCallback($this->currentValue, $callback, $message, $messageKey, $messageData);
+            $this->currentValue = $this->checkCallback(
+                $this->currentValue,
+                $callback,
+                $message,
+                $messageKey,
+                $messageData,
+                $suppressError
+            );
             $report->setFiltered($this->name, $this->currentValue);
         }
         return $report->isOk($this->name);
@@ -682,15 +686,18 @@ class Field
      * @param string $message
      * @param int $messageKey
      * @param array $messageData
+     * @param bool $suppressError
      * @param null|string|int $key
      * @return mixed|null
      */
-    private function checkCallback($value, $callback, $message, $messageKey, $messageData, $key = null)
+    private function checkCallback($value, $callback, $message, $messageKey, $messageData, $suppressError, $key = null)
     {
         $result = call_user_func_array($callback, [$value, $this->getOwnerFieldSet(), $key]);
         if ($result) {
             return $this->getOwnerFieldSet()->getFiltered($this->name);
-        } elseif (!$this->suppressError) {
+        } elseif ($suppressError) {
+            return $this->getReport()->markAsError();
+        } else {
             $messageKey = $messageKey ?: Language::FIELD_FAILED_VALIDATION;
             $messageData = $messageData ?: [];
             if (null !== $key) {
@@ -698,8 +705,6 @@ class Field
             }
             $message = $this->smartMessage($message, $messageKey, $messageData);
             return $this->getReport()->addError($this->name, $message, $key);
-        } else {
-            return null;
         }
     }
 
@@ -780,7 +785,7 @@ class Field
     }
 
     /**
-     * @param int G$key
+     * @param int $key
      * @param array $data
      * @return mixed
      */

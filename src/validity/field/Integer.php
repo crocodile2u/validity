@@ -4,7 +4,7 @@ namespace validity\field;
 
 use validity\Field;
 
-class Integer extends Field implements RangeAware
+class Integer extends Field
 {
     use Range;
 

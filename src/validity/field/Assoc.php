@@ -7,7 +7,6 @@ use validity\FieldSet;
 
 class Assoc extends Field
 {
-    protected $suppressError = true;
     /**
      * Assoc constructor.
      * @param $name
@@ -31,7 +30,10 @@ class Assoc extends Field
                     return $fieldSet->getLastReport()->addError($this->getName(), $errorStr);
                 }
             },
-            null
+            null,
+            null,
+            [],
+            true
         );
     }
 

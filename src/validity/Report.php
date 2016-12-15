@@ -7,6 +7,7 @@ class Report
     private $raw = array();
     private $filtered = array();
     private $errorSet;
+    private $isError = false;
 
     public function __construct($raw)
     {
@@ -17,13 +18,20 @@ class Report
     public function resetErrors($field)
     {
         $this->errorSet->reset($field);
+        $this->isError = false;
         return $this;
+    }
+
+    public function markAsError()
+    {
+        $this->isError = true;
+        return null;
     }
 
     public function isOk($key = null)
     {
         if (null === $key) {
-            return 0 === count($this->errorSet);
+            return (0 === count($this->errorSet)) && !$this->isError;
         } else {
             return !$this->errorSet->offsetExists($key);
         }

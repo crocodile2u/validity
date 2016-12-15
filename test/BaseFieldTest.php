@@ -8,6 +8,10 @@ abstract class BaseFieldTest extends \PHPUnit_Framework_TestCase
 {
     protected function assertValid($data, Field $field, $filtered, $message = null)
     {
+        $result = $field->isValid($data);
+        if (!$result) {
+            $message .= ": " . $field->getOwnerFieldSet()->getErrors()->toString();
+        }
         $this->assertTrue($field->isValid($data), $message);
         $this->assertEquals($filtered, $field->getFiltered(), "Filtered value is incorrect");
     }

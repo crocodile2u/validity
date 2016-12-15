@@ -9,7 +9,7 @@ class DateTest extends BaseFieldTest
 {
     function testValidDate()
     {
-        $this->assertValid("01.01.2010", Field::date("key"), "2010-01-01");
+        $this->assertValid("2010-01-01", Field::date("key"), "2010-01-01");
     }
     function testValidDateWithCustomFormat()
     {

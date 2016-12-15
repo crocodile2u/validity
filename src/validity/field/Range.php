@@ -18,19 +18,16 @@ trait Range
 
     /**
      * @param mixed $min
+     * @param bool $inclusive
      * @param string $message
      * @return $this
      */
-    public function setMin($min, $message = null): Field
+    public function setMin($min, bool $inclusive = true, $message = null): Field
     {
-        /** @var Field $this */
         return $this->addRule(
-            function() use ($min) {
-                if ($this->compareWith($min) < 0) {
-                    return false;
-                } else {
-                    return true;
-                }
+            function() use ($min, $inclusive) {
+                $comparison = $this->compareWith($min);
+                return $inclusive ? ($comparison >= 0) : ($comparison > 0);
             },
             $message,
             $this->resolveMessageKeys()[0],
@@ -40,18 +37,16 @@ trait Range
 
     /**
      * @param mixed $max
+     * @param bool $inclusive
      * @param string $message
      * @return $this
      */
-    public function setMax($max, $message = null): Field
+    public function setMax($max, bool $inclusive = true, $message = null): Field
     {
         return $this->addRule(
-            function() use ($max) {
-                if ($this->compareWith($max) > 0) {
-                    return false;
-                } else {
-                    return true;
-                }
+            function() use ($max, $inclusive) {
+                $comparison = $this->compareWith($max);
+                return $inclusive ? ($comparison <= 0) : ($comparison < 0);
             },
             $message,
             $this->resolveMessageKeys()[1],

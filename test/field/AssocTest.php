@@ -36,11 +36,7 @@ class AssocTest extends BaseFieldTest
 
         $field = Field::assoc('key', $Validator)->addCallbackRule(
             function($value) {
-                if ($value === ['nested_key' => 'valid']) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return $value === ['nested_key' => 'valid'];
             }
         );
         $this->assertTrue($field->isValid(['nested_key' => 'valid']), __METHOD__ . ': validation fails for valid data');
