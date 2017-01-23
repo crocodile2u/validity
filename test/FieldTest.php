@@ -10,7 +10,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 {
     public function testRequiredFieldValidation()
     {
-        $f = Field::any('key');
+        $f = Field::any();
 
         $this->assertTrue($f->isValid(null));
         $this->assertEquals(null, $f->getFiltered());
@@ -23,7 +23,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testConditionalRequiredField()
     {
-        $field = Field::any('key');
+        $field = Field::any();
         $field->setRequiredIf(false);
         $this->assertTrue($field->isValid(null), __METHOD__ . ": Conditional required field should pass validation");
 
@@ -49,7 +49,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultValues()
     {
-        $field = Field::any('key');
+        $field = Field::any();
 
         $field->setDefault('default', true, false);
         $this->assertTrue($field->isValid(null), __METHOD__ . ": value should pass validation");
@@ -58,7 +58,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field->isValid(''), __METHOD__ . ": value should pass validation");
         $this->assertEquals('default', $field->getFiltered(), __METHOD__ . ": default value should be used if value is empty");
 
-        $field = Field::string('key')->setMinLength(10);
+        $field = Field::string()->setMinLength(10);
         $this->assertFalse($field->isValid('too short'));
 
         $field->setDefault('default', true, true);
@@ -81,7 +81,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayValidation()
     {
-        $field = Field::any('key')->expectArray();
+        $field = Field::any()->expectArray();
         $this->assertFalse($field->isValid('asdf'), __METHOD__ . ': value is expected to be an array but scalar passes validation');
         $this->assertTrue($field->isValid(['asdf']), __METHOD__ . ': value is expected to be an array but array fails validation');
         $this->assertTrue($field->isValid([]), __METHOD__ . ': value is expected to be an array but empty array fails validation');
@@ -89,14 +89,14 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayValidationFailsIfAtLeastOneElementFailsValidation()
     {
-        $field = Field::int('key')->expectArray();
+        $field = Field::int()->expectArray();
         $this->assertFalse($field->isValid(array(-1, 0, 1, 'asdf')));
         $this->assertTrue($field->isValid(array(-1, 0, 1)));
     }
 
     public function testCallbackValidation()
     {
-        $field = Field::any('key')->addCallbackRule(
+        $field = Field::any()->addCallbackRule(
             function($value) {
                 if ($value === 'valid') {
                     return $value;
@@ -117,13 +117,13 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->expectException(\TypeError::class);
-        $field = Field::string('key')->addCallbackRule('non_existant_function');
+        $field = Field::string()->addCallbackRule('non_existant_function');
         $field->isValid('anything');
     }
 
     public function testMultipleRules()
     {
-        $field = Field::int('key')->setMin(10)->setMax(20);
+        $field = Field::int()->setMin(10)->setMax(20);
 
         // integer 10 - 20 is accepted
         $this->assertTrue($field->isValid('10'), __METHOD__ . ": valid value fails integer validation");
@@ -168,7 +168,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             return $filter_2_ret;
         };
 
-        $field = Field::any('key')->addFilter($filter_1);
+        $field = Field::any()->addFilter($filter_1);
         $Result = 'val';
         $this->assertTrue($field->isValid($Result), __METHOD__ . ": valid value fails validation (1)");
         $this->assertEquals($filter_1_ret, $field->getFiltered(), __METHOD__ . ": filtered value must contain what filter 1 returns");

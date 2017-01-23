@@ -13,7 +13,7 @@ class Assoc extends Field
      * @param FieldSet $innerFieldSet
      * @param string $errorSeparator
      */
-    protected function __construct($name, FieldSet $innerFieldSet, $errorSeparator = "; ")
+    protected function __construct($name = null, FieldSet $innerFieldSet, $errorSeparator = "; ")
     {
         parent::__construct($name, null);
         $this->addRule(

@@ -9,7 +9,7 @@ class Url extends Str
      * @param string $name
      * @param string $message
      */
-    function __construct(string $name, $message = null)
+    function __construct(string $name = null, $message = null)
     {
         parent::__construct($name, $message);
         $this->addRule(

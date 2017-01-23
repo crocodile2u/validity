@@ -13,7 +13,7 @@ class Str extends Field
      * @param string $name
      * @param string $message
      */
-    protected function __construct(string $name, $message)
+    protected function __construct(string $name = null, $message)
     {
         parent::__construct($name, $message);
     }

@@ -64,7 +64,7 @@ class Field
      * @param string|null $message
      * @return Integer
      */
-    public static function int(string $name, $message = null): Integer
+    public static function int(string $name = null, $message = null): Integer
     {
         return new Integer($name, $message);
     }
@@ -74,7 +74,7 @@ class Field
      * @param string|null $message
      * @return Double
      */
-    public static function float(string $name, $message = null): Double
+    public static function float(string $name = null, $message = null): Double
     {
         return new Double($name, $message);
     }
@@ -84,7 +84,7 @@ class Field
      * @param string|null $message
      * @return Boolean
      */
-    public static function bool(string $name, $message = null): Boolean
+    public static function bool(string $name = null, $message = null): Boolean
     {
         return new Boolean($name, $message);
     }
@@ -94,7 +94,7 @@ class Field
      * @param string|null $message
      * @return Str
      */
-    public static function string(string $name, $message = null): Str
+    public static function string(string $name = null, $message = null): Str
     {
         return new Str($name, $message);
     }
@@ -103,7 +103,7 @@ class Field
      * @param string|null $message
      * @return Date
      */
-    public static function date(string $name, $message = null): Date
+    public static function date(string $name = null, $message = null): Date
     {
         return new Date($name, $message);
     }
@@ -112,7 +112,7 @@ class Field
      * @param string|null $message
      * @return Datetime
      */
-    public static function datetime(string $name, $message = null): Datetime
+    public static function datetime(string $name = null, $message = null): Datetime
     {
         return new Datetime($name, $message);
     }
@@ -123,7 +123,7 @@ class Field
      * @param string|null $message
      * @return Enum
      */
-    public static function enum(string $name, array $values, $message = null): Enum
+    public static function enum(string $name = null, array $values, $message = null): Enum
     {
         return new Enum($name, $values, $message);
     }
@@ -133,7 +133,7 @@ class Field
      * @param string $message
      * @return Field
      */
-    public static function email(string $name, $message = null): Str
+    public static function email(string $name = null, $message = null): Str
     {
         return new Email($name, $message);
     }
@@ -144,7 +144,7 @@ class Field
      * @param string $message
      * @return Str
      */
-    public static function phone(string $name, int $minLength = 7, $message = null): Str
+    public static function phone(string $name = null, int $minLength = 7, $message = null): Str
     {
          return new Phone($name, $minLength, $message);
     }
@@ -155,7 +155,7 @@ class Field
      * @param string $message
      * @return Url
      */
-    public static function url(string $name, $message = null): Url
+    public static function url(string $name = null, $message = null): Url
     {
         return new Url($name, $message);
     }
@@ -166,7 +166,7 @@ class Field
      * @param string $message
      * @return Str
      */
-    public static function pattern(string $name, string $pattern, $message = null): Str
+    public static function pattern(string $name = null, string $pattern, $message = null): Str
     {
         return (new Str($name, $message))->addRegexpRule($pattern, $message);
     }
@@ -178,7 +178,7 @@ class Field
      * @param string $errorSeparator
      * @return Assoc
      */
-    public static function assoc(string $name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; "): Assoc
+    public static function assoc(string $name = null, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; "): Assoc
     {
         return new Assoc($name, $innerFieldSet, $message, $errorSeparator);
     }
@@ -187,7 +187,7 @@ class Field
      * @param $name string
      * @return Any
      */
-    public static function any($name): Any
+    public static function any($name = null): Any
     {
         return new Any($name);
     }
@@ -200,7 +200,7 @@ class Field
      */
     protected function __construct($name, $message)
     {
-        $this->name = $name;
+        $this->name = $name ?? uniqid("field");
         $this->addRule(
             function($value, FieldSet $fieldSet) {
                 $value = $this->castToType($value);

@@ -13,7 +13,7 @@ class Enum extends Field
      * @param array $values
      * @param null $message
      */
-    protected function __construct(string $name, array $values, $message = null)
+    protected function __construct(string $name = null, array $values, $message = null)
     {
         parent::__construct($name, null);
         $this->addRule(

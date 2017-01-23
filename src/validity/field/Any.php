@@ -10,7 +10,7 @@ class Any extends Field
      * Any constructor.
      * @param string $name
      */
-    protected function __construct(string $name)
+    protected function __construct(string $name = null)
     {
         parent::__construct($name, null);
     }

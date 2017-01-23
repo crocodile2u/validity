@@ -9,7 +9,7 @@ class StrTest extends BaseFieldTest
 {
     function testBasicRules()
     {
-        $field = Field::string('key');
+        $field = Field::string();
 
         $this->assertTrue($field->isValid('string'), __METHOD__ . ": valid string fails validation");
         $this->assertEquals('string', $field->getFiltered(), __METHOD__ . ": incorrect filtered value");
@@ -28,7 +28,7 @@ class StrTest extends BaseFieldTest
 
     function testLengthValidation()
     {
-        $field = Field::string('key')->setMinLength(2)->setMaxLength(5);
+        $field = Field::string()->setMinLength(2)->setMaxLength(5);
 
         $this->assertTrue($field->isValid('22'));
         $this->assertTrue($field->isValid('333'));
@@ -40,7 +40,7 @@ class StrTest extends BaseFieldTest
 
     public function testRegexpValidation()
     {
-        $field = Field::string('key')->addRegexpRule('/^start \d+ finish$/xi');
+        $field = Field::string()->addRegexpRule('/^start \d+ finish$/xi');
         $this->assertFalse($field->isValid('start1234finish invalid'), __METHOD__ . ": invalid string passes regexp validation");
         $this->assertTrue($field->isValid('start1234finish'), __METHOD__ . ": valid string fails regexp validation");
     }

@@ -11,7 +11,7 @@ class Email extends Str
      * @param string $name
      * @param string $message
      */
-    protected function __construct(string $name, $message = null)
+    protected function __construct(string $name = null, $message = null)
     {
         parent::__construct($name, $message);
         $this->addRegexpRule(

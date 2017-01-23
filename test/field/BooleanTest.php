@@ -15,7 +15,7 @@ class BooleanTest extends BaseFieldTest
      */
     function testValidation($value, $isValid, $expected = null)
     {
-        $field = Field::bool('key');
+        $field = Field::bool();
         $this->assertEquals(
             $isValid,
             $field->isValid($value),

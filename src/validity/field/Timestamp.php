@@ -26,7 +26,7 @@ abstract class Timestamp extends Str
      * @param string $name
      * @param string $message
      */
-    protected function __construct(string $name, $message)
+    protected function __construct(string $name = null, $message)
     {
         parent::__construct($name, $message);
         $this->outputFormat = static::DEFAULT_OUTPUT_FORMAT;
