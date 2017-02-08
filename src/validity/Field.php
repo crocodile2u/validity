@@ -439,8 +439,12 @@ class Field
     }
 
     /**
-     * @param array $spec
-     * @return $this
+     * @param callable $callback
+     * @param string $message
+     * @param string $messageKey
+     * @param array $messageData
+     * @param bool $suppressError
+     * @return Field
      */
     protected function addRule(callable $callback, $message = null, $messageKey = null, array $messageData = [], $suppressError = false): Field
     {
