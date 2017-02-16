@@ -18,8 +18,8 @@ class DateTimeTest extends BaseFieldTest
     }
     function testNonStrictInputMode()
     {
-        $field = Field::datetime("key")->setInputFormat("d/m/Y", false);
-        $this->assertValid("2010-01-01", $field, "2010-01-01 00:00:00");
+        $ggg = Field::datetime("key")->setInputFormat("d/m/Y", false);
+        $this->assertValid("2010-01-01", $ggg, "2010-01-01 00:00:00");
     }
     function testInvalidDates()
     {
