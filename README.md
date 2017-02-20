@@ -78,17 +78,17 @@ In this code example, no custom messages are used. Because the language is not s
 
 Fields are created using named constructors:
 
-* Field::**int**(string $name, string $message = null),
-* Field::**float**(string $name, string $message = null),
-* Field::**bool**(string $name, string $message = null),
-* Field::**string**(string $name, string $message = null),
-* Field::**date**(string $name, string $message = null),
-* Field::**datetime**(string $name, string $message = null),
-* Field::**enum**(string $name, array $values, string $message = null),
-* Field::**email**(string $name, string $message = null),
-* Field::**phone**(string $name, string $message = null),
-* Field::**pattern**(string $name, string $pattern, string $message = null),
-* Field::**assoc**(string $name, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ").
+* Field::**int**(string $name = null, string $message = null),
+* Field::**float**(string $name = null, string $message = null),
+* Field::**bool**(string $name = null, string $message = null),
+* Field::**string**(string $name = null, string $message = null),
+* Field::**date**(string $name = null, string $message = null),
+* Field::**datetime**(string $name = null, string $message = null),
+* Field::**enum**(string $name = null, array $values, string $message = null),
+* Field::**email**(string $name = null, string $message = null),
+* Field::**phone**(string $name = null, string $message = null),
+* Field::**pattern**(string $name = null, string $pattern, string $message = null),
+* Field::**assoc**(string $name = null, FieldSet $innerFieldSet, $message = null, $errorSeparator = "; ").
 
 Every named constructor return a _Field_ of a corresponding type, most of them being pretty much self-explanating, with an exception of **Assoc**, which you can know more about in [Validating compound values](#validating-compound-values) section.
 
@@ -244,4 +244,4 @@ I chose email validation for this tips on  purpose. Validity also offers email v
 
 ## Labels
 
-Every field must have a name. Name is the first and required parameter to all the [named constructors](#creating-fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
+Every field must have a name. Name is the first parameter to all the [named constructors](#creating-fields). Name is essentially the key of the associative array the _FieldSet_ will validate. In addition, field can also have a label. For example, field name is _date_of_birth_ but label is _Date of birth_. Label can be set with _Field->setLabel(string $label)_. If not set, field name is used as label.
