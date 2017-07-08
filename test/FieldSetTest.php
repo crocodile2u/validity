@@ -2,11 +2,11 @@
 
 namespace validity\test;
 
+use PHPUnit\Framework\TestCase;
 use validity\FieldSet;
-use validity\Report;
 use validity\Field;
 
-class FieldSetTest extends \PHPUnit_Framework_TestCase
+class FieldSetTest extends TestCase
 {
     public function testCheck()
     {

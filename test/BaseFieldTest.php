@@ -2,9 +2,10 @@
 
 namespace validity\test;
 
+use PHPUnit\Framework\TestCase;
 use validity\Field;
 
-abstract class BaseFieldTest extends \PHPUnit_Framework_TestCase
+abstract class BaseFieldTest extends TestCase
 {
     protected function assertValid($data, Field $field, $filtered, $message = null)
     {

@@ -2,11 +2,10 @@
 
 namespace validity\test;
 
-use \validity\FieldSet;
-use \validity\Report;
+use PHPUnit\Framework\TestCase;
 use \validity\Field;
 
-class FieldTest extends \PHPUnit_Framework_TestCase
+class FieldTest extends TestCase
 {
     public function testRequiredFieldValidation()
     {
