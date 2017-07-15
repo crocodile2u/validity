@@ -2,7 +2,7 @@
 
 namespace validity;
 
-class MessageSet extends \ArrayObject
+class MessageSet extends \ArrayObject implements \JsonSerializable
 {
     /**
      * @param string $field
@@ -80,5 +80,13 @@ class MessageSet extends \ArrayObject
     function toString(string $separator = "\n", string $innerSeparator = "; ")
     {
         return join($separator, $this->toPlainArray($innerSeparator));
+    }
+
+    /**
+     * @return array
+     */
+    function jsonSerialize()
+    {
+        return $this->export();
     }
 }
