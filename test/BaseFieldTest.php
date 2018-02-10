@@ -7,7 +7,7 @@ use validity\Field;
 
 abstract class BaseFieldTest extends TestCase
 {
-    protected function assertValid($data, Field $field, $filtered, $message = null)
+    protected function assertValid($data, Field $field, $filtered, $message = "")
     {
         $result = $field->isValid($data);
         if (!$result) {
@@ -16,7 +16,7 @@ abstract class BaseFieldTest extends TestCase
         $this->assertTrue($field->isValid($data), $message);
         $this->assertEquals($filtered, $field->getFiltered(), "Filtered value is incorrect");
     }
-    protected function assertInvalid($data, Field $field, $filtered = null, $message = null)
+    protected function assertInvalid($data, Field $field, $filtered = null, $message = "")
     {
         $this->assertFalse($field->isValid($data), $message);
         $this->assertSame($filtered, $field->getFiltered(), "Filtered value should be NULL");

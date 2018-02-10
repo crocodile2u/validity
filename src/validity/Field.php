@@ -554,7 +554,7 @@ class Field
                 $this->addError($this->getArrayMessage());
                 return false;
             }
-        } elseif (!$this->allowsArray() && !is_scalar($this->currentValue)) {// value MUST BE a scalar
+        } elseif (!$this->allowsArray() && !is_scalar($this->currentValue) && !is_null($this->currentValue)) {// value MUST BE a scalar
             $this->addError($this->predefinedMessage(Language::SCALAR_EXPECTED));
             return false;
         }
