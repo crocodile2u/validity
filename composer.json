@@ -1,11 +1,19 @@
 {
   "name": "crocodile2u/validity",
   "autoload": {
-    "psr-0" : {
-      "validity" : "./src"
+    "psr-4" : {
+      "validity\\" : "src/validity"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "validity\\test\\": "test/"
+    }
+  },
+  "require": {
+    "php": ">=7.0"
+  },
   "require-dev": {
-    "phpunit/phpunit": "*"
+    "phpunit/phpunit": "^4.8 | ^6.5"
   }
 }
